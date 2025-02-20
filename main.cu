@@ -5,6 +5,7 @@
 #include <iomanip>
 #include <iostream>
 #include <ostream>
+#include <vector>
 
 #define DATA float
 
@@ -14,6 +15,8 @@
 #define DIM2_KERNEL_ROW_COL                                                    \
   size_t row = blockIdx.x * blockDim.x + threadIdx.x;                          \
   size_t col = blockIdx.y * blockDim.y + threadIdx.y;
+
+using std::vector;
 
 const size_t THREADS_PER_BLOCK_DIM = 16;
 
@@ -290,6 +293,33 @@ public:
   }
 };
 
+class NN {
+private:
+  vector<Matrix> weights;
+  vector<Matrix> biases;
+  vector<Matrix> activations;
+
+  vector<size_t> layer_sizes;
+  size_t layer_count;
+
+public:
+  NN(vector<size_t> layer_sizes)
+      : layer_sizes(layer_sizes), layer_count(layer_sizes.size()) {
+
+    // Must have input and output layer
+    assert(layer_sizes.size() >= 2);
+
+    for (size_t i = 0; i < layer_count; i++) {
+      activations.push_back(Matrix(layer_sizes.at(i), 1));
+
+      if (i != 0) {
+        weights.push_back(Matrix(layer_sizes.at(i), layer_sizes.at(i - 1)));
+        biases.push_back(Matrix(layer_sizes.at(i), 1));
+      }
+    }
+  }
+};
+
 int main(void) {
   srand(time(0));
 
@@ -298,11 +328,6 @@ int main(void) {
 
   mat1.device_fill_rand(-1, 1);
   mat2.device_fill_rand(-1, 1);
-
-  // std::cout << "Mat 1:" << std::endl;
-  // mat1.host_print();
-  // std::cout << "Mat 2:" << std::endl;
-  // mat2.host_print();
 
   Matrix dst(10, 3);
 
