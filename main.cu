@@ -18,7 +18,7 @@
 
 using std::vector;
 
-const size_t THREADS_PER_BLOCK_DIM = 16;
+size_t const THREADS_PER_BLOCK_DIM = 16;
 
 typedef enum DataLocation {
   DEVICE,
@@ -91,6 +91,8 @@ private:
   }
 
 public:
+  Matrix() {}
+
   Matrix(size_t rows, size_t cols)
       : shape(Shape{.rows = rows, .cols = cols}),
         size(rows * cols * sizeof(DATA)) {
@@ -98,12 +100,15 @@ public:
     assert(h_elems != NULL);
   }
 
-  Matrix(DATA *h_ptr, size_t rows, size_t cols, bool matrix_owns_ptr)
-      : shape(Shape{.rows = rows, .cols = cols}),
-        size(rows * cols * sizeof(DATA)), h_elems(h_ptr),
-        matrix_owns_ptr(matrix_owns_ptr) {
-    assert(h_elems != NULL);
   }
+
+  // TODO: Deprecated
+  // Matrix(DATA *h_ptr, size_t rows, size_t cols, bool matrix_owns_ptr)
+  // : shape(Shape{.rows = rows, .cols = cols}),
+  // size(rows * cols * sizeof(DATA)), h_elems(h_ptr),
+  // matrix_owns_ptr(matrix_owns_ptr) {
+  // assert(h_elems != NULL);
+  // }
 
   ~Matrix() {
     if (device_is_initialized) {
@@ -295,17 +300,26 @@ public:
 
 class NN {
 private:
-  Matrix input_layer = Matrix(NULL, 0, 0, false);
+  Matrix input_layer;
   bool input_is_init = false;
+  size_t input_size;
 
   vector<Matrix> activations;
   vector<Matrix> weights;
   vector<Matrix> biases;
 
 public:
-  NN(vector<size_t> layer_sizes) {
-    for (size_t n : layer_sizes) {
-      // TODO
+  NN(vector<size_t> layer_sizes) : input_size(layer_sizes[0]) {
+    // Must have at least input and output;
+    assert(layer_sizes.size() >= 2);
+
+    // NOTE: Iteration starts at 1 since we do not
+    //       want to allocate anything for the input
+    //       layer.
+    for (size_t i = 1; i < layer_sizes.size(); i++) {
+      activations.push_back(Matrix(layer_sizes[i], 1));
+      biases.push_back(Matrix(layer_sizes[i], 1));
+      weights.push_back(Matrix(layer_sizes[i], layer_sizes[i - 1]));
     }
   }
 };
