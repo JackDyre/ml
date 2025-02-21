@@ -83,7 +83,7 @@ private:
   DataLocation data_location = HOST;
 
   bool device_is_initialized = false;
-  bool host_is_on_stack = false;
+  bool matrix_owns_ptr = false;
 
   void initialize_device() {
     assert(cudaSuccess == cudaMalloc(&d_elems, size));
@@ -98,10 +98,10 @@ public:
     assert(h_elems != NULL);
   }
 
-  Matrix(DATA *h_ptr, size_t rows, size_t cols, bool ptr_is_on_stack)
+  Matrix(DATA *h_ptr, size_t rows, size_t cols, bool matrix_owns_ptr)
       : shape(Shape{.rows = rows, .cols = cols}),
         size(rows * cols * sizeof(DATA)), h_elems(h_ptr),
-        host_is_on_stack(ptr_is_on_stack) {
+        matrix_owns_ptr(matrix_owns_ptr) {
     assert(h_elems != NULL);
   }
 
@@ -109,7 +109,7 @@ public:
     if (device_is_initialized) {
       cudaFree(d_elems);
     }
-    if (!host_is_on_stack) {
+    if (!matrix_owns_ptr) {
       std::free(h_elems);
     }
   }
@@ -295,27 +295,17 @@ public:
 
 class NN {
 private:
+  Matrix input_layer = Matrix(NULL, 0, 0, false);
+  bool input_is_init = false;
+
+  vector<Matrix> activations;
   vector<Matrix> weights;
   vector<Matrix> biases;
-  vector<Matrix> activations;
-
-  vector<size_t> layer_sizes;
-  size_t layer_count;
 
 public:
-  NN(vector<size_t> layer_sizes)
-      : layer_sizes(layer_sizes), layer_count(layer_sizes.size()) {
-
-    // Must have input and output layer
-    assert(layer_sizes.size() >= 2);
-
-    for (size_t i = 0; i < layer_count; i++) {
-      activations.push_back(Matrix(layer_sizes.at(i), 1));
-
-      if (i != 0) {
-        weights.push_back(Matrix(layer_sizes.at(i), layer_sizes.at(i - 1)));
-        biases.push_back(Matrix(layer_sizes.at(i), 1));
-      }
+  NN(vector<size_t> layer_sizes) {
+    for (size_t n : layer_sizes) {
+      // TODO
     }
   }
 };
