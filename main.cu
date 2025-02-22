@@ -6,8 +6,6 @@
 #include <iostream>
 #include <ostream>
 
-#include "lazy_alloc.cu"
-
 #define DATA float
 
 #define ptr_idx(shape, row, col) ((row) * (shape).cols + (col))
