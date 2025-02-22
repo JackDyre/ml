@@ -39,10 +39,10 @@ class LazyDeviceAllocator {
 private:
   size_t alloc_size;
 
-  float *host_ptr = NULL;
+  void *host_ptr = NULL;
   DeviceState host_state = NO_ALLOC;
 
-  float *dev_ptr = NULL;
+  void *dev_ptr = NULL;
   DeviceState dev_state = NO_ALLOC;
 
   LazyDeviceAllocator() {}
@@ -117,7 +117,7 @@ public:
     return d;
   }
 
-  static LazyDeviceAllocator new_owned_host(float *host_ptr, size_t size) {
+  static LazyDeviceAllocator new_owned_host(void *host_ptr, size_t size) {
     auto d = LazyDeviceAllocator::new_no_alloc(size);
     assert(host_ptr != NULL);
     d.set_host_ptr_unchecked(host_ptr);
@@ -125,7 +125,7 @@ public:
     return d;
   }
 
-  static LazyDeviceAllocator new_borrowed_host(float *host_ptr, size_t size) {
+  static LazyDeviceAllocator new_borrowed_host(void *host_ptr, size_t size) {
     auto d = LazyDeviceAllocator::new_no_alloc(size);
     assert(host_ptr != NULL);
     d.set_host_ptr_unchecked(host_ptr);
@@ -133,7 +133,7 @@ public:
     return d;
   }
 
-  static LazyDeviceAllocator new_owned_dev(float *dev_ptr, size_t size) {
+  static LazyDeviceAllocator new_owned_dev(void *dev_ptr, size_t size) {
     auto d = LazyDeviceAllocator::new_no_alloc(size);
     assert(dev_ptr != NULL);
     d.set_dev_ptr_unchecked(dev_ptr);
@@ -141,7 +141,7 @@ public:
     return d;
   }
 
-  static LazyDeviceAllocator new_borrowed_dev(float *dev_ptr, size_t size) {
+  static LazyDeviceAllocator new_borrowed_dev(void *dev_ptr, size_t size) {
     auto d = LazyDeviceAllocator::new_no_alloc(size);
     assert(dev_ptr != NULL);
     d.set_dev_ptr_unchecked(dev_ptr);
@@ -229,7 +229,7 @@ public:
    *       does not set DeviceState flags
    */
   void alloc_host_unchecked() {
-    float *ptr = (float *)std::malloc(alloc_size);
+    void *ptr = (float *)std::malloc(alloc_size);
     assert(ptr != NULL);
     set_host_ptr_unchecked(ptr);
   }
@@ -247,7 +247,7 @@ public:
    *       does not set DeviceState flags
    */
   void alloc_dev_unchecked() {
-    float *ptr;
+    void *ptr;
     auto err = cudaMalloc(&ptr, alloc_size);
     assert(err == cudaSuccess);
     set_dev_ptr_unchecked(ptr);
@@ -299,15 +299,15 @@ public:
    *       that the overwritten ptr is not leaked. This
    *       method does not set DeviceState flags
    */
-  void set_host_ptr_unchecked(float *host_ptr) { this->host_ptr = host_ptr; }
+  void set_host_ptr_unchecked(void *host_ptr) { this->host_ptr = host_ptr; }
 
   /*
    * NOTE: The caller is responsible for ensuring the
    *       ptr is valid
    */
-  float *get_host_ptr_unchecked() { return host_ptr; }
+  void *get_host_ptr_unchecked() { return host_ptr; }
 
-  float *get_host_ptr() {
+  void *get_host_ptr() {
     ensure_on_host();
     return host_ptr;
   }
@@ -318,15 +318,15 @@ public:
    *       that the overwritten ptr is not leaked. This
    *       method does not set DeviceState flags
    */
-  void set_dev_ptr_unchecked(float *dev_ptr) { this->dev_ptr = dev_ptr; }
+  void set_dev_ptr_unchecked(void *dev_ptr) { this->dev_ptr = dev_ptr; }
 
   /*
    * NOTE: The caller is responsible for ensuring the
    *       ptr is valid
    */
-  float *get_dev_ptr_unchecked() { return dev_ptr; }
+  void *get_dev_ptr_unchecked() { return dev_ptr; }
 
-  float *get_dev_ptr() {
+  void *get_dev_ptr() {
     ensure_on_dev();
     return dev_ptr;
   }
