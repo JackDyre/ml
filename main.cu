@@ -5,7 +5,6 @@
 #include <iomanip>
 #include <iostream>
 #include <ostream>
-#include <vector>
 
 #include "lazy_alloc.cu"
 
@@ -17,8 +16,6 @@
 #define DIM2_KERNEL_ROW_COL                                                    \
   size_t row = blockIdx.x * blockDim.x + threadIdx.x;                          \
   size_t col = blockIdx.y * blockDim.y + threadIdx.y;
-
-using std::vector;
 
 size_t const THREADS_PER_BLOCK_DIM = 16;
 
@@ -295,32 +292,6 @@ public:
     matrix_fill_rand_kernel<<<blocks_per_grid, threads_per_block>>>(
         d_elems, shape, low, high, rand());
     assert(cudaSuccess == cudaDeviceSynchronize());
-  }
-};
-
-class NN {
-private:
-  Matrix input_layer;
-  bool input_is_init = false;
-  size_t input_size;
-
-  vector<Matrix> activations;
-  vector<Matrix> weights;
-  vector<Matrix> biases;
-
-public:
-  NN(vector<size_t> layer_sizes) : input_size(layer_sizes[0]) {
-    // Must have at least input and output;
-    assert(layer_sizes.size() >= 2);
-
-    // NOTE: Iteration starts at 1 since we do not
-    //       want to allocate anything for the input
-    //       layer.
-    for (size_t i = 1; i < layer_sizes.size(); i++) {
-      activations.push_back(Matrix(layer_sizes[i], 1));
-      biases.push_back(Matrix(layer_sizes[i], 1));
-      weights.push_back(Matrix(layer_sizes[i], layer_sizes[i - 1]));
-    }
   }
 };
 
