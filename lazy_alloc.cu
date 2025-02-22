@@ -1,3 +1,6 @@
+#ifndef LAZY_ALLOC_CU
+#define LAZY_ALLOC_CU
+
 #include <cassert>
 #include <cstdlib>
 #include <ctime>
@@ -331,3 +334,5 @@ public:
     return dev_ptr;
   }
 };
+
+#endif // LAZY_ALLOC_CU
