@@ -7,6 +7,8 @@
 #include <ostream>
 #include <vector>
 
+#include "lazy_alloc.cu"
+
 #define DATA float
 
 #define ptr_idx(shape, row, col) ((row) * (shape).cols + (col))
@@ -98,8 +100,6 @@ public:
         size(rows * cols * sizeof(DATA)) {
     h_elems = (DATA *)std::malloc(size);
     assert(h_elems != NULL);
-  }
-
   }
 
   // TODO: Deprecated
