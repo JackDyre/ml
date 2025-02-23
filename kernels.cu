@@ -1,8 +1,8 @@
-#ifndef KERNELS_CU
-#define KERNELS_CU
-
 #include <cassert>
 #include <curand_kernel.h>
+
+#ifndef KERNELS_CU
+#define KERNELS_CU
 
 #define ptr_idx(stride, row, col) ((row) * stride + (col))
 
