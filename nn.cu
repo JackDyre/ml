@@ -73,6 +73,9 @@ public:
         activations[i].dev_mul(weights[i], activations[i - 1]);
       }
       activations[i].dev_add(biases[i]);
+      launch_matrix_relu_kernel(activations[i].get_dev_ptr_unchecked(),
+                                activations[i].get_shape().rows,
+                                activations[i].get_shape().cols);
     }
   }
 
@@ -137,6 +140,10 @@ public:
     cudaMemcpy(&cost, d_out, sizeof(float), cudaMemcpyDeviceToHost);
 
     return cost / num_elems;
+  }
+
+  void grad(NN grad_nn) {
+    // UNIMPLEMENTED
   }
 };
 

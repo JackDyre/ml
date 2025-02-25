@@ -124,4 +124,26 @@ void launch_matrix_mse_kernel(T *dst, T *output, T *target, size_t rows,
   assert(cudaSuccess == cudaDeviceSynchronize());
 }
 
+template <typename T>
+__global__ void _matrix_relu_kernel(T *dst, size_t rows, size_t cols) {
+  assert(threadIdx.z == 0 && blockIdx.z == 0);
+
+  size_t row = blockIdx.x * blockDim.x + threadIdx.x;
+  size_t col = blockIdx.y * blockDim.y + threadIdx.y;
+
+  if (row < rows && col < cols) {
+    size_t idx = ptr_idx(cols, row, col);
+    if (dst[idx] < 0) {
+      dst[idx] = 0;
+    }
+  }
+}
+
+template <typename T>
+void launch_matrix_relu_kernel(T *dst, size_t rows, size_t cols) {
+  _matrix_relu_kernel<<<blocks_per_grid(dim3(rows, cols, 1)),
+                        THREADS_PER_BLOCK>>>(dst, rows, cols);
+  assert(cudaSuccess == cudaDeviceSynchronize());
+}
+
 #endif // KERNELS_CU
