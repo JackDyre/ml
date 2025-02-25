@@ -50,13 +50,8 @@ private:
 
   LazyDeviceAllocator() {}
 
-  /*
-   * NOTE: The caller is responsible for
-   *       ensuring the host is alloced
-   */
+public:
   void set_host_valid_unchecked() {
-    assert(host_state != NO_ALLOC);
-
     if (host_state == OWNED_INVALID) {
       host_state = OWNED_VALID;
     } else if (host_state == BORROWED_INVALID) {
@@ -64,13 +59,7 @@ private:
     }
   }
 
-  /*
-   * NOTE: The caller is responsible for
-   *       ensuring the host is alloced
-   */
   void set_host_invalid_unchecked() {
-    assert(host_state != NO_ALLOC);
-
     if (host_state == OWNED_VALID) {
       host_state = OWNED_INVALID;
     } else if (host_state == BORROWED_VALID) {
@@ -78,13 +67,7 @@ private:
     }
   }
 
-  /*
-   * NOTE: The caller is responsible for
-   *       ensuring the device is alloced
-   */
   void set_dev_valid_unchecked() {
-    assert(dev_state != NO_ALLOC);
-
     if (dev_state == OWNED_INVALID) {
       dev_state = OWNED_VALID;
     } else if (dev_state == BORROWED_INVALID) {
@@ -92,13 +75,7 @@ private:
     }
   }
 
-  /*
-   * NOTE: The caller is responsible for
-   *       ensuring the device is alloced
-   */
   void set_dev_invalid_unchecked() {
-    assert(dev_state != NO_ALLOC);
-
     if (dev_state == OWNED_VALID) {
       dev_state = OWNED_INVALID;
     } else if (dev_state == BORROWED_VALID) {
@@ -106,7 +83,9 @@ private:
     }
   }
 
-public:
+  void set_host_state_unchecked(DeviceState state) { host_state = state; }
+  void set_dev_state_unchecked(DeviceState state) { dev_state = state; }
+
   LazyDeviceAllocator &operator=(const LazyDeviceAllocator &) = delete;
 
   ~LazyDeviceAllocator() {
@@ -333,6 +312,8 @@ public:
     ensure_on_dev();
     return dev_ptr;
   }
+
+  size_t get_alloc_size() { return alloc_size; }
 };
 
 #endif // LAZY_ALLOC_CU

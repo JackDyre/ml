@@ -8,4 +8,10 @@ typedef struct Shape {
   size_t cols;
 } Shape;
 
+typedef enum Device {
+  DEVICE,
+  HOST,
+  NONE,
+} Device;
+
 #endif // TYPES_H

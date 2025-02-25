@@ -150,6 +150,59 @@ public:
     launch_matrix_mul_kernel(self_ptr, a_ptr, b_ptr, shape.rows, shape.cols,
                              a.shape.cols);
   }
+
+  void set_borrowed_host_ptr_unchecked(float *host_ptr) {
+    allocator.free_host();
+    allocator.set_host_ptr_unchecked(host_ptr);
+    allocator.set_host_state_unchecked(BORROWED_VALID);
+    allocator.set_dev_invalid_unchecked();
+  }
+
+  void set_owned_host_ptr_unchecked(float *host_ptr) {
+    allocator.free_host();
+    allocator.set_host_ptr_unchecked(host_ptr);
+    allocator.set_host_state_unchecked(OWNED_VALID);
+    allocator.set_dev_invalid_unchecked();
+  }
+
+  void set_borrowed_dev_ptr_unchecked(float *dev_ptr) {
+    allocator.free_dev();
+    allocator.set_dev_ptr_unchecked(dev_ptr);
+    allocator.set_dev_state_unchecked(BORROWED_VALID);
+    allocator.set_host_invalid_unchecked();
+  }
+
+  void set_owned_dev_ptr_unchecked(float *dev_ptr) {
+    allocator.free_dev();
+    allocator.set_dev_ptr_unchecked(dev_ptr);
+    allocator.set_dev_state_unchecked(OWNED_VALID);
+    allocator.set_host_invalid_unchecked();
+  }
+
+  float *get_host_ptr_unchecked() {
+    return (float *)allocator.get_host_ptr_unchecked();
+  }
+  float *get_dev_ptr_unchecked() {
+    return (float *)allocator.get_dev_ptr_unchecked();
+  }
+
+  Device current_device() {
+    if (allocator.dev_is_valid()) {
+      return Device::DEVICE;
+    } else if (allocator.host_is_valid()) {
+      return Device::HOST;
+    } else {
+      return Device::NONE;
+    }
+  }
+
+  Shape get_shape() { return shape; }
+
+  size_t elem_count() { return shape.rows * shape.cols; }
+
+  void to_host() { allocator.ensure_on_host(); }
+  void to_dev() { allocator.ensure_on_dev(); }
+  size_t alloc_size() { return allocator.get_alloc_size(); }
 };
 
 #endif // MATRIX_CU
