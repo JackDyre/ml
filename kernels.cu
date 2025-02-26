@@ -6,6 +6,9 @@
 
 #define ptr_idx(stride, row, col) ((row) * stride + (col))
 
+#define act(z) ((z) < 0 ? 0 : (z))
+#define d_act(z) ((z) < 0 ? 0 : 1)
+
 const dim3 THREADS_PER_BLOCK = dim3(16, 16, 1);
 dim3 blocks_per_grid(dim3 inp_dim) {
   return dim3((inp_dim.x + THREADS_PER_BLOCK.x - 1) / THREADS_PER_BLOCK.x,
