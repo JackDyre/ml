@@ -9,14 +9,14 @@ int main(void) {
   nn.dev_fill_rand(-1, 1);
 
   Matrix input(Shape{.rows = 8, .cols = 1});
-  input.dev_fill_rand(-1, 1);
+  input.dev_fill_rand(0, 1);
   nn.set_input_unchecked(input);
 
   nn.dev_forward();
   nn.get_output()->host_print();
 
   Matrix target_output(Shape{.rows = 20, .cols = 1});
-  target_output.dev_fill_rand(-1, 1);
+  target_output.dev_fill_rand(0, 1);
   target_output.host_print();
 
   float cost = nn.mse_cost(target_output);

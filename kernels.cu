@@ -6,8 +6,8 @@
 
 #define ptr_idx(stride, row, col) ((row) * stride + (col))
 
-#define act(z) ((z) < 0 ? 0 : (z))
-#define d_act(z) ((z) < 0 ? 0 : 1)
+#define relu(z) ((z) < 0 ? 0 : (z))
+#define d_relu(z) ((z) < 0 ? 0 : 1)
 
 const dim3 THREADS_PER_BLOCK = dim3(16, 16, 1);
 dim3 blocks_per_grid(dim3 inp_dim) {
@@ -136,9 +136,7 @@ __global__ void _matrix_relu_kernel(T *dst, size_t rows, size_t cols) {
 
   if (row < rows && col < cols) {
     size_t idx = ptr_idx(cols, row, col);
-    if (dst[idx] < 0) {
-      dst[idx] = 0;
-    }
+    dst[idx] = relu(dst[idx]);
   }
 }
 

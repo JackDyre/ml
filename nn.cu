@@ -142,7 +142,7 @@ public:
     return cost / num_elems;
   }
 
-  void grad(NN grad_nn) {
+  void grad(NN grad_nn, Matrix &target_output) {
     // UNIMPLEMENTED
   }
 };
