@@ -79,6 +79,26 @@ public:
     }
   }
 
+  void host_forward() {
+    for (size_t i = 0; i < activations.size(); i++) {
+      if (i == 0) {
+        activations[i].host_mul(weights[i], input);
+      } else {
+        activations[i].host_mul(weights[i], activations[i - 1]);
+      }
+      activations[i].host_add(biases[i]);
+
+      float *ptr = activations[i].get_host_ptr_unchecked();
+      Shape shape = activations[i].get_shape();
+      for (size_t r = 0; r < shape.rows; r++) {
+        for (size_t c = 0; c < shape.cols; c++) {
+          size_t idx = ptr_idx(shape.cols, r, c);
+          ptr[idx] = relu(ptr[idx]);
+        }
+      }
+    }
+  }
+
   Matrix *get_output() { return &activations[activations.size() - 1]; }
 
   void print_weights() {
@@ -101,7 +121,7 @@ public:
     }
   }
 
-  float mse_cost(Matrix &target_output) {
+  float dev_mse_cost(Matrix &target_output) {
     // FIXME: Allocation in fn
     // FIXME: handle cuda errors
 
@@ -142,8 +162,126 @@ public:
     return cost / num_elems;
   }
 
-  void grad(NN grad_nn, Matrix &target_output) {
-    // UNIMPLEMENTED
+  float host_mse_cost(Matrix &target_output) {
+    auto output = get_output();
+    output->to_host();
+    float *output_ptr = output->get_host_ptr_unchecked();
+
+    target_output.to_host();
+    float *target_ptr = target_output.get_host_ptr_unchecked();
+
+    Shape shape = output->get_shape();
+    size_t num_elems = output->elem_count();
+    float sum_squared_diff = 0.0f;
+
+    for (size_t r = 0; r < shape.rows; r++) {
+      for (size_t c = 0; c < shape.cols; c++) {
+        size_t idx = ptr_idx(shape.cols, r, c);
+        float diff = target_ptr[idx] - output_ptr[idx];
+        sum_squared_diff += diff * diff;
+      }
+    }
+
+    return sum_squared_diff / num_elems;
+  }
+
+  void grad(NN &grad_nn, Matrix &target_output) {
+
+    // Initialize gradient at 0
+    grad_nn.input.dev_fill(0);
+    for (size_t l = 0; l < activations.size(); l++) {
+      grad_nn.weights[l].dev_fill(0);
+      grad_nn.biases[l].dev_fill(0);
+      grad_nn.activations[l].dev_fill(0);
+    }
+
+    // Perform backpropagation
+    for (int l = activations.size() - 1; l >= 0; l--) {
+      float *target_ptr = target_output.get_host_ptr();
+
+      float *g_a = grad_nn.activations[l].get_host_ptr();
+      float *g_b = grad_nn.biases[l].get_host_ptr();
+      float *g_w = grad_nn.weights[l].get_host_ptr();
+
+      float *g_a_next = (l < activations.size() - 1)
+                            ? grad_nn.activations[l + 1].get_host_ptr()
+                            : NULL;
+
+      float *a_prev =
+          (l == 0) ? input.get_host_ptr() : activations[l - 1].get_host_ptr();
+
+      float *a = activations[l].get_host_ptr();
+      float *b = biases[l].get_host_ptr();
+      float *w = weights[l].get_host_ptr();
+
+      float *w_next =
+          (l < activations.size() - 1) ? weights[l + 1].get_host_ptr() : NULL;
+      float *b_next =
+          (l < activations.size() - 1) ? biases[l + 1].get_host_ptr() : NULL;
+
+      // return;
+
+      for (size_t r = 0; r < activations[l].get_shape().rows; r++) {
+
+        // Gradient of layer activations
+        if (l == activations.size() - 1) {
+
+          // We are computing the output layer
+          size_t idx = ptr_idx(1, r, 0);
+          g_a[idx] = 2 * (a[idx] - target_ptr[idx]);
+        } else {
+          // We are computing non-output activations
+          float val = 0;
+          for (int k = 0; k < activations[l + 1].get_shape().rows; k++) {
+            float z_next = b_next[ptr_idx(1, k, 0)];
+            for (int i = 0; i < activations[l].get_shape().rows; i++) {
+              z_next += w_next[ptr_idx(weights[l + 1].get_shape().cols, k, i)] *
+                        a[ptr_idx(1, i, 0)];
+            }
+            val += g_a_next[ptr_idx(1, k, 0)] * d_relu(z_next) *
+                   w_next[ptr_idx(weights[l + 1].get_shape().cols, k, r)];
+          }
+          g_a[ptr_idx(1, r, 0)] = val;
+        }
+
+        // Gradient of layer weights
+        float z = b[ptr_idx(1, r, 0)];
+        int prev_size =
+            (l == 0 ? input.get_shape() : activations[l - 1].get_shape()).rows;
+        for (int i = 0; i < prev_size; i++) {
+          z += w[ptr_idx(weights[l].get_shape().cols, r, i)] *
+               a_prev[ptr_idx(1, i, 0)];
+        }
+
+        g_b[ptr_idx(1, r, 0)] = g_a[ptr_idx(1, r, 0)] * d_relu(z);
+
+        size_t w_cols = weights[l].get_shape().cols;
+        for (int c = 0; c < w_cols; c++) {
+          g_w[ptr_idx(w_cols, r, c)] =
+              g_a[ptr_idx(1, r, 0)] * d_relu(z) * a_prev[ptr_idx(1, c, 0)];
+        }
+      }
+    }
+  }
+
+  void nn_step(NN &grad_nn, float lr) {
+    // Update weights and biases based on gradients
+    for (size_t l = 0; l < weights.size(); l++) {
+      // Get device pointers (these calls ensure data is on device)
+      float *g_w = grad_nn.weights[l].get_dev_ptr();
+      float *g_b = grad_nn.biases[l].get_dev_ptr();
+      float *w = weights[l].get_dev_ptr();
+      float *b = biases[l].get_dev_ptr();
+
+      // Update weights using gradient descent
+      Shape w_shape = weights[l].get_shape();
+      Shape b_shape = biases[l].get_shape();
+
+      launch_matrix_gradient_step_kernel(w, g_w, lr, w_shape.rows,
+                                         w_shape.cols);
+      launch_matrix_gradient_step_kernel(b, g_b, lr, b_shape.rows,
+                                         b_shape.cols);
+    }
   }
 };
 

@@ -179,6 +179,10 @@ public:
     allocator.set_host_invalid_unchecked();
   }
 
+  float *get_host_ptr() { return (float *)allocator.get_host_ptr(); }
+
+  float *get_dev_ptr() { return (float *)allocator.get_dev_ptr(); }
+
   float *get_host_ptr_unchecked() {
     return (float *)allocator.get_host_ptr_unchecked();
   }
