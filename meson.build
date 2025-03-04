@@ -8,7 +8,6 @@ project(
 
 arch = 'sm_89'
 
-
 cpp_args = ['-std=c++20', '-Wall', '-Wextra', '-Werror', '-O3']
 
 cuda_args = [

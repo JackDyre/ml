@@ -1,7 +1,7 @@
 #include "kernels.h"
 #include <cassert>
-#include <curand_kernel.h>
 #include <cub/device/device_reduce.cuh>
+#include <curand_kernel.h>
 
 #define ptr_idx(stride, row, col) ((row) * stride + (col))
 
@@ -157,7 +157,8 @@ void launch_matrix_gradient_step_kernel(float *param, float *grad, float lr,
   assert(cudaSuccess == cudaDeviceSynchronize());
 }
 
-float calculate_dev_mse_cost(float *output_ptr, float *target_ptr, size_t num_elems) {
+float calculate_dev_mse_cost(float *output_ptr, float *target_ptr,
+                             size_t num_elems) {
   float *dst;
   cudaMalloc(&dst, num_elems * sizeof(float));
 
@@ -169,11 +170,13 @@ float calculate_dev_mse_cost(float *output_ptr, float *target_ptr, size_t num_el
   float *d_out;
   cudaMalloc(&d_out, sizeof(float));
 
-  cub::DeviceReduce::Sum(d_temp_storage, temp_storage_bytes, dst, d_out, num_elems);
+  cub::DeviceReduce::Sum(d_temp_storage, temp_storage_bytes, dst, d_out,
+                         num_elems);
 
   cudaMalloc(&d_temp_storage, temp_storage_bytes);
 
-  cub::DeviceReduce::Sum(d_temp_storage, temp_storage_bytes, dst, d_out, num_elems);
+  cub::DeviceReduce::Sum(d_temp_storage, temp_storage_bytes, dst, d_out,
+                         num_elems);
 
   float cost;
   cudaMemcpy(&cost, d_out, sizeof(float), cudaMemcpyDeviceToHost);
