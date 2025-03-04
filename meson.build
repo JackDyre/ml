@@ -1,6 +1,6 @@
 project(
     'ml',
-    'c',
+    'cpp',
     'cuda',
     version: '0.0.1-unstable',
     default_options: ['warning_level=3'],
@@ -8,7 +8,6 @@ project(
 
 arch = 'sm_89'
 
-cuda = find_program('nvcc')
 
 cuda_args = [
     '-arch=' + arch,
@@ -22,20 +21,27 @@ cuda_args = [
 kernels_lib = static_library(
     'kernels',
     'kernels.cu',
-    'kernels.h',
+    sources: ['kernels.h'],
     cuda_args: cuda_args,
 )
 
 lazy_alloc_lib = static_library(
     'lazy_alloc',
     'lazy_alloc.cu',
-    'lazy_alloc.h',
+    sources: ['lazy_alloc.h'],
     cuda_args: cuda_args,
+)
+
+matrix_lib = static_library(
+    'matrix',
+    'matrix.cpp',
+    sources: ['matrix.h'],
+    link_with: [kernels_lib, lazy_alloc_lib],
 )
 
 executable(
     'ml',
     'main.cu',
-    link_with: [kernels_lib, lazy_alloc_lib],
     cuda_args: cuda_args,
+    link_with: [kernels_lib, matrix_lib],
 )

@@ -3,7 +3,7 @@
 
 #include <cub/device/device_reduce.cuh>
 
-#include "matrix.cu"
+#include "matrix.h"
 
 #ifndef NN_CU
 #define NN_CU
@@ -196,7 +196,8 @@ public:
     }
 
     // Perform backpropagation
-    for (long int l = static_cast<long int>(activations.size()) - 1; l >= 0; l--) {
+    for (long int l = static_cast<long int>(activations.size()) - 1; l >= 0;
+         l--) {
       float *target_ptr = target_output.get_host_ptr();
 
       float *g_a = grad_nn.activations[l].get_host_ptr();
@@ -214,10 +215,12 @@ public:
       float *b = biases[l].get_host_ptr();
       float *w = weights[l].get_host_ptr();
 
-      float *w_next =
-          (static_cast<size_t>(l) < activations.size() - 1) ? weights[l + 1].get_host_ptr() : NULL;
-      float *b_next =
-          (static_cast<size_t>(l) < activations.size() - 1) ? biases[l + 1].get_host_ptr() : NULL;
+      float *w_next = (static_cast<size_t>(l) < activations.size() - 1)
+                          ? weights[l + 1].get_host_ptr()
+                          : NULL;
+      float *b_next = (static_cast<size_t>(l) < activations.size() - 1)
+                          ? biases[l + 1].get_host_ptr()
+                          : NULL;
 
       // return;
 
