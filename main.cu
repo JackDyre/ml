@@ -10,14 +10,14 @@ int main(void) {
 
   const float LEARNING_RATE = .01;
 
-  size_t layer_sizes[] = {input_dim, 2, output_dim};
+  size_t layer_sizes[] = {input_dim, 10, 17, 10, output_dim};
   NN nn(layer_sizes, sizeof(layer_sizes) / sizeof(size_t));
   NN grad_nn(layer_sizes, sizeof(layer_sizes) / sizeof(size_t));
 
   nn.dev_fill_rand(-1, 1);
 
   float inp1[2] = {0, 0};
-  float out1[1] = {0};
+  float out1[1] = {1};
 
   float inp2[2] = {1, 0};
   float out2[1] = {1};

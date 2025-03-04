@@ -1,6 +1,7 @@
-#include "kernels.cu"
-#include "lazy_alloc.cu"
+#include "kernels.h"
+#include "lazy_alloc.h"
 #include "types.h"
+
 #include <iomanip>
 #include <iostream>
 

@@ -196,14 +196,14 @@ public:
     }
 
     // Perform backpropagation
-    for (int l = activations.size() - 1; l >= 0; l--) {
+    for (long int l = static_cast<long int>(activations.size()) - 1; l >= 0; l--) {
       float *target_ptr = target_output.get_host_ptr();
 
       float *g_a = grad_nn.activations[l].get_host_ptr();
       float *g_b = grad_nn.biases[l].get_host_ptr();
       float *g_w = grad_nn.weights[l].get_host_ptr();
 
-      float *g_a_next = (l < activations.size() - 1)
+      float *g_a_next = (static_cast<size_t>(l) < activations.size() - 1)
                             ? grad_nn.activations[l + 1].get_host_ptr()
                             : NULL;
 
@@ -215,16 +215,16 @@ public:
       float *w = weights[l].get_host_ptr();
 
       float *w_next =
-          (l < activations.size() - 1) ? weights[l + 1].get_host_ptr() : NULL;
+          (static_cast<size_t>(l) < activations.size() - 1) ? weights[l + 1].get_host_ptr() : NULL;
       float *b_next =
-          (l < activations.size() - 1) ? biases[l + 1].get_host_ptr() : NULL;
+          (static_cast<size_t>(l) < activations.size() - 1) ? biases[l + 1].get_host_ptr() : NULL;
 
       // return;
 
       for (size_t r = 0; r < activations[l].get_shape().rows; r++) {
 
         // Gradient of layer activations
-        if (l == activations.size() - 1) {
+        if (static_cast<size_t>(l) == activations.size() - 1) {
 
           // We are computing the output layer
           size_t idx = ptr_idx(1, r, 0);
@@ -232,9 +232,9 @@ public:
         } else {
           // We are computing non-output activations
           float val = 0;
-          for (int k = 0; k < activations[l + 1].get_shape().rows; k++) {
+          for (size_t k = 0; k < activations[l + 1].get_shape().rows; k++) {
             float z_next = b_next[ptr_idx(1, k, 0)];
-            for (int i = 0; i < activations[l].get_shape().rows; i++) {
+            for (size_t i = 0; i < activations[l].get_shape().rows; i++) {
               z_next += w_next[ptr_idx(weights[l + 1].get_shape().cols, k, i)] *
                         a[ptr_idx(1, i, 0)];
             }
@@ -246,9 +246,9 @@ public:
 
         // Gradient of layer weights
         float z = b[ptr_idx(1, r, 0)];
-        int prev_size =
+        size_t prev_size =
             (l == 0 ? input.get_shape() : activations[l - 1].get_shape()).rows;
-        for (int i = 0; i < prev_size; i++) {
+        for (size_t i = 0; i < prev_size; i++) {
           z += w[ptr_idx(weights[l].get_shape().cols, r, i)] *
                a_prev[ptr_idx(1, i, 0)];
         }
@@ -256,7 +256,7 @@ public:
         g_b[ptr_idx(1, r, 0)] = g_a[ptr_idx(1, r, 0)] * d_relu(z);
 
         size_t w_cols = weights[l].get_shape().cols;
-        for (int c = 0; c < w_cols; c++) {
+        for (size_t c = 0; c < w_cols; c++) {
           g_w[ptr_idx(w_cols, r, c)] =
               g_a[ptr_idx(1, r, 0)] * d_relu(z) * a_prev[ptr_idx(1, c, 0)];
         }
