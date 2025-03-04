@@ -9,13 +9,7 @@ project(
 arch = 'sm_89'
 
 
-cpp_args = [
-    '-std=c++20',
-    '-Wall',
-    '-Wextra',
-    '-Werror',
-    '-O3',
-]
+cpp_args = ['-std=c++20', '-Wall', '-Wextra', '-Werror', '-O3']
 
 cuda_args = [
     '-arch=' + arch,
@@ -63,3 +57,5 @@ main = executable(
     cpp_args: cpp_args,
     link_with: [nn_lib],
 )
+
+determine_arch = executable('determine_arch', 'determine_arch.cu')

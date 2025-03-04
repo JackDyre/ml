@@ -5,5 +5,5 @@ int main(void) {
   if (err != cudaSuccess) {
     return 1;
   }
-  std::cout << "sm_" << prop.major << prop.minor;
+  std::cout << "sm_" << prop.major << prop.minor << std::endl;
 }
