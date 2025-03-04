@@ -19,5 +19,6 @@ void launch_matrix_mse_kernel(float *dst, float *output, float *target,
 void launch_matrix_relu_kernel(float *dst, size_t rows, size_t cols);
 void launch_matrix_gradient_step_kernel(float *param, float *grad, float lr,
                                         size_t rows, size_t cols);
+float calculate_dev_mse_cost(float *output_ptr, float *target_ptr, size_t num_elems);
 
 #endif // KERNELS_H

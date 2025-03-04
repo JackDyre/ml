@@ -1,26 +1,7 @@
-#include <csignal>
-#include <vector>
+#include "nn.h"
 
-#include <cub/device/device_reduce.cuh>
-
-#include "matrix.h"
-
-#ifndef NN_CU
-#define NN_CU
-
-using std::vector;
-
-class NN {
-private:
-  Matrix input;
-
-  vector<Matrix> activations;
-  vector<Matrix> weights;
-  vector<Matrix> biases;
-
-public:
-  NN(size_t *layer_sizes, size_t layer_count)
-      : input(Matrix(Shape{.rows = layer_sizes[0], .cols = 1})) {
+NN::NN(size_t *layer_sizes, size_t layer_count)
+    : input(Matrix(Shape{.rows = layer_sizes[0], .cols = 1})) {
     // Must have at least input and output;
     assert(layer_count >= 2);
 
@@ -30,9 +11,9 @@ public:
       weights.push_back(
           Matrix(Shape{.rows = layer_sizes[i], .cols = layer_sizes[i - 1]}));
     }
-  }
+}
 
-  void host_fill_rand(float low, float high) {
+void NN::host_fill_rand(float low, float high) {
     for (auto mat : weights) {
       mat.host_fill_rand(low, high);
     }
@@ -40,9 +21,9 @@ public:
     for (auto mat : biases) {
       mat.host_fill_rand(low, high);
     }
-  }
+}
 
-  void dev_fill_rand(float low, float high) {
+void NN::dev_fill_rand(float low, float high) {
     for (size_t i = 0; i < weights.size(); i++) {
       weights[i].dev_fill_rand(low, high);
     }
@@ -50,9 +31,9 @@ public:
     for (size_t i = 0; i < biases.size(); i++) {
       biases[i].dev_fill_rand(low, high);
     }
-  }
+}
 
-  void set_input_unchecked(Matrix &input) {
+void NN::set_input_unchecked(Matrix &input) {
     Device device = input.current_device();
     assert(device != NONE);
 
@@ -63,9 +44,9 @@ public:
       float *dev_ptr = input.get_dev_ptr_unchecked();
       this->input.set_borrowed_dev_ptr_unchecked(dev_ptr);
     }
-  }
+}
 
-  void dev_forward() {
+void NN::dev_forward() {
     for (size_t i = 0; i < activations.size(); i++) {
       if (i == 0) {
         activations[i].dev_mul(weights[i], input);
@@ -77,9 +58,9 @@ public:
                                 activations[i].get_shape().rows,
                                 activations[i].get_shape().cols);
     }
-  }
+}
 
-  void host_forward() {
+void NN::host_forward() {
     for (size_t i = 0; i < activations.size(); i++) {
       if (i == 0) {
         activations[i].host_mul(weights[i], input);
@@ -97,72 +78,42 @@ public:
         }
       }
     }
-  }
+}
 
-  Matrix *get_output() { return &activations[activations.size() - 1]; }
+Matrix* NN::get_output() { 
+    return &activations[activations.size() - 1]; 
+}
 
-  void print_weights() {
+void NN::print_weights() {
     for (size_t i = 0; i < weights.size(); i++) {
       weights[i].host_print();
     }
-  }
+}
 
-  void print_activations() {
+void NN::print_activations() {
     input.host_print();
 
     for (size_t i = 0; i < activations.size(); i++) {
       activations[i].host_print();
     }
-  }
+}
 
-  void print_biases() {
+void NN::print_biases() {
     for (size_t i = 0; i < biases.size(); i++) {
       biases[i].host_print();
     }
-  }
+}
 
-  float dev_mse_cost(Matrix &target_output) {
-    // FIXME: Allocation in fn
-    // FIXME: handle cuda errors
-
-    float *dst;
-    cudaMalloc(&dst, target_output.alloc_size());
-
+float NN::dev_mse_cost(Matrix &target_output) {
     auto output = get_output();
-    output->to_dev();
-    float *outp_ptr = output->get_dev_ptr_unchecked();
-
-    target_output.to_dev();
-    float *target_ptr = target_output.get_dev_ptr_unchecked();
-
-    launch_matrix_mse_kernel(dst, outp_ptr, target_ptr,
-                             output->get_shape().rows,
-                             output->get_shape().cols);
-
+    float *outp_ptr = output->get_dev_ptr();
+    float *target_ptr = target_output.get_dev_ptr();
+    
     size_t num_elems = output->elem_count();
+    return calculate_dev_mse_cost(outp_ptr, target_ptr, num_elems);
+}
 
-    void *d_temp_storage = NULL;
-    size_t temp_storage_bytes = 0;
-
-    float *d_out;
-    cudaMalloc(&d_out, sizeof(float));
-
-    cub::DeviceReduce::Sum(d_temp_storage, temp_storage_bytes, dst, d_out,
-                           num_elems);
-
-    cudaMalloc(&d_temp_storage, temp_storage_bytes);
-
-    cub::DeviceReduce::Sum(d_temp_storage, temp_storage_bytes, dst, d_out,
-                           num_elems);
-
-    float cost;
-
-    cudaMemcpy(&cost, d_out, sizeof(float), cudaMemcpyDeviceToHost);
-
-    return cost / num_elems;
-  }
-
-  float host_mse_cost(Matrix &target_output) {
+float NN::host_mse_cost(Matrix &target_output) {
     auto output = get_output();
     output->to_host();
     float *output_ptr = output->get_host_ptr_unchecked();
@@ -183,10 +134,9 @@ public:
     }
 
     return sum_squared_diff / num_elems;
-  }
+}
 
-  void grad(NN &grad_nn, Matrix &target_output) {
-
+void NN::grad(NN &grad_nn, Matrix &target_output) {
     // Initialize gradient at 0
     grad_nn.input.dev_fill(0);
     for (size_t l = 0; l < activations.size(); l++) {
@@ -265,9 +215,9 @@ public:
         }
       }
     }
-  }
+}
 
-  void nn_step(NN &grad_nn, float lr) {
+void NN::nn_step(NN &grad_nn, float lr) {
     // Update weights and biases based on gradients
     for (size_t l = 0; l < weights.size(); l++) {
       // Get device pointers (these calls ensure data is on device)
@@ -285,7 +235,4 @@ public:
       launch_matrix_gradient_step_kernel(b, g_b, lr, b_shape.rows,
                                          b_shape.cols);
     }
-  }
-};
-
-#endif // NN_CU
+}

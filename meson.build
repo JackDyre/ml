@@ -3,11 +3,19 @@ project(
     'cpp',
     'cuda',
     version: '0.0.1-unstable',
-    default_options: ['warning_level=3'],
+    default_options: ['warning_level=3', 'cpp_std=c++20'],
 )
 
 arch = 'sm_89'
 
+
+cpp_args = [
+    '-std=c++20',
+    '-Wall',
+    '-Wextra',
+    '-Werror',
+    '-O3',
+]
 
 cuda_args = [
     '-arch=' + arch,
@@ -37,11 +45,21 @@ matrix_lib = static_library(
     'matrix.cpp',
     sources: ['matrix.h'],
     link_with: [kernels_lib, lazy_alloc_lib],
+    cpp_args: cpp_args,
 )
 
-executable(
+nn_lib = static_library(
+    'nn',
+    'nn.cpp',
+    sources: ['nn.h'],
+    link_with: [matrix_lib, kernels_lib],
+    cpp_args: cpp_args,
+)
+
+main = executable(
     'ml',
-    'main.cu',
+    'main.cpp',
     cuda_args: cuda_args,
-    link_with: [kernels_lib, matrix_lib],
+    cpp_args: cpp_args,
+    link_with: [nn_lib],
 )

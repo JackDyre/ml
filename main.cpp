@@ -1,4 +1,4 @@
-#include "nn.cu"
+#include "nn.h"
 
 int main(void) {
   srand(time(0));
