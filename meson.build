@@ -20,9 +20,9 @@ cuda_args = [
 ]
 
 kernels_lib = static_library(
-    'kernels',
-    'kernels.cu',
-    sources: ['kernels.h'],
+    'old_kernels',
+    'old_kernels.cu',
+    sources: ['old_kernels.h'],
     cuda_args: cuda_args,
 )
 

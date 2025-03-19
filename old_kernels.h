@@ -1,5 +1,5 @@
-#ifndef KERNELS_H
-#define KERNELS_H
+#ifndef OLD_KERNELS_H
+#define OLD_KERNELS_H
 
 #include <stddef.h>
 
@@ -21,4 +21,4 @@ void launch_matrix_gradient_step_kernel(float *param, float *grad, float lr,
 float calculate_dev_mse_cost(float *output_ptr, float *target_ptr,
                              size_t num_elems);
 
-#endif // KERNELS_H
+#endif // OLD_KERNELS_H

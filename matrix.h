@@ -1,7 +1,7 @@
 #ifndef MATRIX_HPP
 #define MATRIX_HPP
 
-#include "kernels.h"
+#include "old_kernels.h"
 #include "old_lazy_alloc.h"
 #include "types.h"
 

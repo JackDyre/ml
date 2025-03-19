@@ -1,4 +1,4 @@
-#include "kernels.h"
+#include "old_kernels.h"
 #include <cassert>
 #include <cub/device/device_reduce.cuh>
 #include <curand_kernel.h>

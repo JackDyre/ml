@@ -5,7 +5,7 @@
 #include <vector>
 
 #include "matrix.h"
-#include "kernels.h"
+#include "old_kernels.h"
 
 using std::vector;
 
