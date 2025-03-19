@@ -1,4 +1,4 @@
-#include "lazy_alloc.h"
+#include "old_lazy_alloc.h"
 #include <cassert>
 #include <cstdlib>
 #include <ctime>

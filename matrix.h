@@ -2,7 +2,7 @@
 #define MATRIX_HPP
 
 #include "kernels.h"
-#include "lazy_alloc.h"
+#include "old_lazy_alloc.h"
 #include "types.h"
 
 #include <cassert>

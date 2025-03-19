@@ -27,9 +27,9 @@ kernels_lib = static_library(
 )
 
 lazy_alloc_lib = static_library(
-    'lazy_alloc',
-    'lazy_alloc.cu',
-    sources: ['lazy_alloc.h'],
+    'old_lazy_alloc',
+    'old_lazy_alloc.cu',
+    sources: ['old_lazy_alloc.h'],
     cuda_args: cuda_args,
 )
 
