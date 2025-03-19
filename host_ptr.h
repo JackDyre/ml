@@ -1,0 +1,21 @@
+#ifndef HOST_PTR_H
+#define HOST_PTR_H
+
+#include "ptr.h"
+#include <cstddef>
+#include <cstdlib>
+
+class HostPtr : public Ptr {
+public:
+  HostPtr();
+  explicit HostPtr(float *ptr);
+  HostPtr(HostPtr &&other) noexcept;
+  HostPtr &operator=(HostPtr &&other) noexcept;
+  ~HostPtr() override;
+
+protected:
+  void alloc(std::size_t size) override;
+  void free() override;
+};
+
+#endif // HOST_PTR_H

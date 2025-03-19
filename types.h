@@ -14,4 +14,15 @@ typedef enum Device {
   NONE,
 } Device;
 
+typedef enum DeviceStrict {
+  _STRICT_DEVICE,
+  _STRICT_HOST,
+} DeviceStrict;
+
+typedef enum DeviceOpt {
+  _OPT_DEVICE,
+  _OPT_HOST,
+  _OPT_NONE,
+} DeviceOpt;
+
 #endif // TYPES_H

@@ -58,3 +58,26 @@ main = executable(
 )
 
 determine_arch = executable('determine_arch', 'determine_arch.cu')
+
+ptr = static_library(
+  'ptr',
+  'ptr.cpp',
+  sources: ['ptr.h'],
+  cpp_args: cpp_args,
+)
+
+host_ptr = static_library(
+  'host_ptr',
+  'host_ptr.cpp',
+  sources: ['host_ptr.h'],
+  cpp_args: cpp_args,
+  link_with: [ptr]
+)
+
+device_ptr = static_library(
+  'device_ptr',
+  'device_ptr.cu',
+  sources: ['device_ptr.h'],
+  cuda_args: cuda_args,
+  link_with: [ptr]
+)
