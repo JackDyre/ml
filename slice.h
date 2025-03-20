@@ -5,7 +5,7 @@
 
 class Slice {
 protected:
-  std::size_t size;
+  std::size_t _size;
   bool allocated = false;
 
   explicit Slice(std::size_t size, bool allocated);
@@ -27,7 +27,7 @@ public:
   virtual const float *as_raw_inner() = 0;
   virtual const float *as_valid_inner() = 0;
   bool is_allocated();
-  std::size_t get_size();
+  std::size_t size();
 };
 
 #endif // !SLICE_H

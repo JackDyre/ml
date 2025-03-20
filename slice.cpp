@@ -1,22 +1,22 @@
 #include "slice.h"
 
 Slice::Slice(std::size_t size, bool allocated)
-    : size(size), allocated(allocated) {}
+    : _size(size), allocated(allocated) {}
 
 // Move constructor
 Slice::Slice(Slice &&other) noexcept
-    : size(other.size), allocated(other.allocated) {
-  other.size = 0;
+    : _size(other._size), allocated(other.allocated) {
+  other._size = 0;
   other.allocated = false;
 }
 
 // Move assignment operator
 Slice &Slice::operator=(Slice &&other) noexcept {
   if (this != &other) {
-    size = other.size;
+    _size = other._size;
     allocated = other.allocated;
 
-    other.size = 0;
+    other._size = 0;
     other.allocated = false;
   }
   return *this;
@@ -24,4 +24,4 @@ Slice &Slice::operator=(Slice &&other) noexcept {
 
 bool Slice::is_allocated() { return allocated; }
 
-std::size_t Slice::get_size() { return size; }
+std::size_t Slice::size() { return _size; }

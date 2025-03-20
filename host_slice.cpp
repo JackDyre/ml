@@ -24,7 +24,7 @@ const float *HostSlice::as_raw_inner() { return host_ptr.as_inner(); }
 
 const float *HostSlice::as_valid_inner() {
   if (is_allocated()) {
-    host_ptr.alloc_mut_unchecked(get_size());
+    host_ptr.alloc_mut_unchecked(size());
   }
   return host_ptr.as_inner();
 }

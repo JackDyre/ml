@@ -27,7 +27,7 @@ const float *DeviceSlice::as_raw_inner() {
 
 const float *DeviceSlice::as_valid_inner() {
   if (is_allocated()) {
-    device_ptr.alloc_mut_unchecked(get_size());
+    device_ptr.alloc_mut_unchecked(size());
   }
   return device_ptr.as_inner();
 }

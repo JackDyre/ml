@@ -2,7 +2,7 @@ project(
     'ml',
     'cpp',
     'cuda',
-    version: '0.0.1-unstable',
+    version: '0.0.1',
     default_options: ['warning_level=3', 'cpp_std=c++20'],
 )
 
@@ -97,4 +97,12 @@ device_slice = static_library(
     sources: ['device_slice.h'],
     cpp_args: cpp_args,
     link_with: [slice, device_ptr],
+)
+
+dual_slice = static_library(
+  'dual_slice',
+  'dual_slice.cu',
+  sources: ['dual_slice.h'],
+  cuda_args: cuda_args,
+  link_with: [host_slice, device_slice]
 )
