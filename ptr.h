@@ -15,6 +15,8 @@ public:
 
   const float *as_inner();
   bool is_null();
+  void alloc_mut_unchecked(std::size_t size);
+
   virtual ~Ptr();
 
   // Delete copy operations
@@ -27,11 +29,11 @@ public:
   // Move assignment operator
   Ptr &operator=(Ptr &&other) noexcept;
 
-protected:
+public:
   // Immutably allocate a ptr the provided size.
-  virtual float *_alloc(std::size_t size);
+  virtual float *_alloc(std::size_t size) = 0;
   // Immutably free the provided ptr.
-  virtual void _free(float *ptr);
+  virtual void _free(float *ptr) = 0;
 };
 
 #endif // LAZY_PTR_H

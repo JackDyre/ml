@@ -52,32 +52,49 @@ nn_lib = static_library(
 main = executable(
     'ml',
     'main.cpp',
-    cuda_args: cuda_args,
     cpp_args: cpp_args,
     link_with: [nn_lib],
 )
 
 determine_arch = executable('determine_arch', 'determine_arch.cu')
 
-ptr = static_library(
-  'ptr',
-  'ptr.cpp',
-  sources: ['ptr.h'],
-  cpp_args: cpp_args,
-)
+ptr = static_library('ptr', 'ptr.cpp', sources: ['ptr.h'], cpp_args: cpp_args)
 
 host_ptr = static_library(
-  'host_ptr',
-  'host_ptr.cpp',
-  sources: ['host_ptr.h'],
-  cpp_args: cpp_args,
-  link_with: [ptr]
+    'host_ptr',
+    'host_ptr.cpp',
+    sources: ['host_ptr.h'],
+    cpp_args: cpp_args,
+    link_with: [ptr],
 )
 
 device_ptr = static_library(
-  'device_ptr',
-  'device_ptr.cu',
-  sources: ['device_ptr.h'],
-  cuda_args: cuda_args,
-  link_with: [ptr]
+    'device_ptr',
+    'device_ptr.cu',
+    sources: ['device_ptr.h'],
+    cuda_args: cuda_args,
+    link_with: [ptr],
+)
+
+slice = static_library(
+    'slice',
+    'slice.cpp',
+    sources: ['slice.h'],
+    cpp_args: cpp_args,
+)
+
+host_slice = static_library(
+    'host_slice',
+    'host_slice.cpp',
+    sources: ['host_slice.h'],
+    cpp_args: cpp_args,
+    link_with: [slice, host_ptr],
+)
+
+device_slice = static_library(
+    'device_slice',
+    'device_slice.cpp',
+    sources: ['device_slice.h'],
+    cpp_args: cpp_args,
+    link_with: [slice, device_ptr],
 )

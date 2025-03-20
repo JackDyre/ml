@@ -12,7 +12,7 @@ public:
   DevicePtr &operator=(DevicePtr &&other) noexcept;
   ~DevicePtr() override;
 
-protected:
+public:
   float *_alloc(std::size_t size) override;
   void _free(float *ptr) override;
 };

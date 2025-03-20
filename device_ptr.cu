@@ -12,7 +12,7 @@ DevicePtr &DevicePtr::operator=(DevicePtr &&other) noexcept {
   return *this;
 }
 
-DevicePtr::~DevicePtr() = default;
+DevicePtr::~DevicePtr() { _free(const_cast<float *>(as_inner())); }
 
 float *DevicePtr::_alloc(std::size_t size) {
   float *ptr;

@@ -12,7 +12,7 @@ HostPtr &HostPtr::operator=(HostPtr &&other) noexcept {
   return *this;
 }
 
-HostPtr::~HostPtr() = default;
+HostPtr::~HostPtr() { _free(const_cast<float *>(as_inner())); }
 
 float *HostPtr::_alloc(std::size_t size) {
   float *ptr = static_cast<float *>(std::malloc(size * sizeof(float)));
