@@ -1,5 +1,5 @@
-#ifndef MATRIX_HPP
-#define MATRIX_HPP
+#ifndef OLD_MATRIX_HPP
+#define OLD_MATRIX_HPP
 
 #include "old_kernels.h"
 #include "old_lazy_alloc.h"
@@ -54,4 +54,4 @@ public:
   size_t alloc_size();
 };
 
-#endif // MATRIX_HPP
+#endif // OLD_MATRIX_HPP

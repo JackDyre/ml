@@ -1,4 +1,4 @@
-#include "nn.h"
+#include "old_nn.h"
 
 NN::NN(size_t *layer_sizes, size_t layer_count)
     : input(Matrix(Shape{.rows = layer_sizes[0], .cols = 1})) {

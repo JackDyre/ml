@@ -1,4 +1,4 @@
-#include "nn.h"
+#include "old_nn.h"
 
 int main(void) {
   srand(time(0));

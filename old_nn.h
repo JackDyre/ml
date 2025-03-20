@@ -1,10 +1,10 @@
-#ifndef NN_H
-#define NN_H
+#ifndef OLD_NN_H
+#define OLD_NN_H
 
 #include <csignal>
 #include <vector>
 
-#include "matrix.h"
+#include "old_matrix.h"
 #include "old_kernels.h"
 
 using std::vector;
@@ -34,4 +34,4 @@ public:
   void nn_step(NN &grad_nn, float lr);
 };
 
-#endif // NN_H
+#endif // OLD_NN_H
