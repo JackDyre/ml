@@ -11,6 +11,8 @@ private:
 public:
   Ptr();
   explicit Ptr(float *ptr);
+  explicit Ptr(std::size_t size);
+
   const float *as_inner();
   bool is_null();
   virtual ~Ptr();
@@ -26,8 +28,10 @@ public:
   Ptr &operator=(Ptr &&other) noexcept;
 
 protected:
-  virtual void alloc(std::size_t size);
-  virtual void free();
+  // Immutably allocate a ptr the provided size.
+  virtual float *_alloc(std::size_t size);
+  // Immutably free the provided ptr.
+  virtual void _free(float *ptr);
 };
 
 #endif // LAZY_PTR_H

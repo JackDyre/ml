@@ -14,14 +14,14 @@ HostPtr &HostPtr::operator=(HostPtr &&other) noexcept {
 
 HostPtr::~HostPtr() = default;
 
-void HostPtr::alloc(std::size_t size) {
+float *HostPtr::_alloc(std::size_t size) {
   float *ptr = static_cast<float *>(std::malloc(size * sizeof(float)));
   assert(ptr != nullptr);
-  *this = HostPtr(ptr);
+  return ptr;
 }
 
-void HostPtr::free() {
+void HostPtr::_free(float *ptr) {
   if (!is_null()) {
-    std::free(const_cast<float *>(as_inner()));
+    std::free(const_cast<float *>(ptr));
   }
 }

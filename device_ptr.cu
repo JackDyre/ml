@@ -14,16 +14,16 @@ DevicePtr &DevicePtr::operator=(DevicePtr &&other) noexcept {
 
 DevicePtr::~DevicePtr() = default;
 
-void DevicePtr::alloc(std::size_t size) {
+float *DevicePtr::_alloc(std::size_t size) {
   float *ptr;
   auto err = cudaMalloc(&ptr, size * sizeof(float));
   assert(err == cudaSuccess);
-  *this = DevicePtr(ptr);
+  return ptr;
 }
 
-void DevicePtr::free() {
-  if (!is_null()) {
-    auto err = cudaFree(const_cast<float *>(as_inner()));
+void DevicePtr::_free(float *ptr) {
+  if (ptr != nullptr) {
+    auto err = cudaFree(const_cast<float *>(ptr));
     assert(err = cudaSuccess);
   }
 }

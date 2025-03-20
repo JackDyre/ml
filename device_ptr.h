@@ -13,8 +13,8 @@ public:
   ~DevicePtr() override;
 
 protected:
-  void alloc(std::size_t size) override;
-  void free() override;
+  float *_alloc(std::size_t size) override;
+  void _free(float *ptr) override;
 };
 
 #endif // DEVICE_PTR_H
