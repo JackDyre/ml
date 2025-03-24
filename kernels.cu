@@ -1,7 +1,7 @@
 #include "kernels.h"
 #include "util.h"
 #include <cassert>
-#include <iostream>
+#include <curand_kernel.h>
 
 #define thread_block_idx(dim) blockDim.dim *blockIdx.dim + threadIdx.dim
 #define panic_on_cuda_error(err) assert(err == cudaSuccess)
@@ -33,6 +33,28 @@ __global__ void kernel_matrix_fill(MatrixFill args) {
 
 void device_matrix_fill(MatrixFill args) {
   kernel_matrix_fill<<<kernel_config(args.rows, args.cols, 1)>>>(args);
+  auto err = cudaDeviceSynchronize();
+  panic_on_cuda_error(err);
+}
+
+__global__ void kernel_matrix_rand(MatrixRand args) {
+  std::size_t r = thread_block_idx(x);
+  std::size_t c = thread_block_idx(y);
+  std::size_t z = thread_block_idx(z);
+
+  if (r >= args.rows || c >= args.cols || z != 0) {
+    return;
+  }
+
+  curandState state;
+  curand_init(args.seed, mat_idx(r, c, args.stride), 0, &state);
+
+  args.d_ptr[mat_idx(r, c, args.stride)] =
+      args.low + (args.high - args.low) * curand_uniform(&state);
+}
+
+void device_matrix_rand(MatrixRand args) {
+  kernel_matrix_rand<<<kernel_config(args.rows, args.cols, 1)>>>(args);
   auto err = cudaDeviceSynchronize();
   panic_on_cuda_error(err);
 }

@@ -36,10 +36,26 @@ void Matrix::print_h() {
 
 void Matrix::fill_d(float val) {
   float *ptr = (float *)slice.get_device_valid_inner();
+
   auto launch_args = MatrixFill{.d_ptr = ptr,
                                 .rows = shape.rows,
                                 .cols = shape.cols,
                                 .stride = stride,
                                 .val = val};
+
   device_matrix_fill(launch_args);
+}
+
+void Matrix::rand_d(float low, float high) {
+  float *ptr = (float *)slice.get_device_valid_inner();
+
+  auto launch_args = MatrixRand{.d_ptr = ptr,
+                                .rows = shape.rows,
+                                .cols = shape.cols,
+                                .stride = stride,
+                                .seed = rand(),
+                                .low = low,
+                                .high = high};
+
+  device_matrix_rand(launch_args);
 }

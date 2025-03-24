@@ -34,6 +34,7 @@ public:
 
   void print_h();
   void fill_d(float val);
+  void rand_d(float low, float high);
 };
 
 #endif // !MATRIX_H
