@@ -10,14 +10,14 @@ private:
 
 public:
   // Constructors
-  DeviceSlice(std::size_t size);
-  DeviceSlice(DevicePtr device_ptr, std::size_t size);
-  
+  DeviceSlice(std::size_t count);
+  DeviceSlice(DevicePtr device_ptr, std::size_t count);
+
   // Move constructor
   DeviceSlice(DeviceSlice &&other) noexcept;
   // Move assignment operator
   DeviceSlice &operator=(DeviceSlice &&other) noexcept;
-  
+
   // Virtual method implementations
   const float *as_raw_inner() override;
   const float *as_valid_inner() override;

@@ -11,7 +11,6 @@ private:
 public:
   Ptr();
   explicit Ptr(float *ptr);
-  explicit Ptr(std::size_t size);
 
   const float *as_inner();
   bool is_null();

@@ -10,8 +10,8 @@ private:
 
 public:
   // Constructors
-  HostSlice(std::size_t size);
-  HostSlice(HostPtr host_ptr, std::size_t size);
+  HostSlice(std::size_t count);
+  HostSlice(HostPtr host_ptr, std::size_t count);
 
   // Move constructor
   HostSlice(HostSlice &&other) noexcept;

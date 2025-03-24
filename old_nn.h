@@ -4,8 +4,8 @@
 #include <csignal>
 #include <vector>
 
-#include "old_matrix.h"
 #include "old_kernels.h"
+#include "old_matrix.h"
 
 using std::vector;
 

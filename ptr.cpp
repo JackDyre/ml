@@ -24,5 +24,3 @@ Ptr &Ptr::operator=(Ptr &&other) noexcept {
   }
   return *this;
 }
-
-Ptr::Ptr(std::size_t size) : Ptr(Ptr::_alloc(size)) {}

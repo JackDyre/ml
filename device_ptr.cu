@@ -24,6 +24,6 @@ float *DevicePtr::_alloc(std::size_t size) {
 void DevicePtr::_free(float *ptr) {
   if (ptr != nullptr) {
     auto err = cudaFree(const_cast<float *>(ptr));
-    assert(err = cudaSuccess);
+    assert(err == cudaSuccess);
   }
 }

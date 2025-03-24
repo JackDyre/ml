@@ -101,3 +101,26 @@ dual_slice = static_library(
     cuda_args: cuda_args,
     link_with: [host_slice, device_slice],
 )
+
+kernels = static_library(
+  'kernels',
+  'kernels.cu',
+  sources: ['kernels.h', 'kernel_types.h'],
+  cuda_args: cuda_args,
+)
+
+matrix = static_library(
+    'matrix',
+    'matrix.cpp',
+    sources: ['matrix.h'],
+    cpp_args: cpp_args,
+    link_with: [dual_slice, kernels],
+)
+
+run = executable(
+    'run',
+    'run.cpp',
+    cpp_args: cpp_args,
+    cuda_args: cuda_args,
+    link_with: [matrix],
+)

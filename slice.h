@@ -5,10 +5,10 @@
 
 class Slice {
 protected:
-  std::size_t _size;
+  std::size_t _count;
   bool allocated = false;
 
-  explicit Slice(std::size_t size, bool allocated);
+  explicit Slice(std::size_t count, bool allocated);
 
 public:
   // Destructor
@@ -27,7 +27,7 @@ public:
   virtual const float *as_raw_inner() = 0;
   virtual const float *as_valid_inner() = 0;
   bool is_allocated();
-  std::size_t size();
+  std::size_t count();
 };
 
 #endif // !SLICE_H

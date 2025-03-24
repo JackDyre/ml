@@ -1,11 +1,11 @@
 #include "device_slice.h"
 
 // Constructors
-DeviceSlice::DeviceSlice(std::size_t size)
-    : Slice(size, false), device_ptr() {}
+DeviceSlice::DeviceSlice(std::size_t count)
+    : Slice(count, false), device_ptr() {}
 
-DeviceSlice::DeviceSlice(DevicePtr device_ptr, std::size_t size)
-    : Slice(size, true), device_ptr(std::move(device_ptr)) {}
+DeviceSlice::DeviceSlice(DevicePtr device_ptr, std::size_t count)
+    : Slice(count, true), device_ptr(std::move(device_ptr)) {}
 
 // Move constructor
 DeviceSlice::DeviceSlice(DeviceSlice &&other) noexcept
@@ -21,13 +21,12 @@ DeviceSlice &DeviceSlice::operator=(DeviceSlice &&other) noexcept {
 }
 
 // Virtual method implementations
-const float *DeviceSlice::as_raw_inner() {
-  return device_ptr.as_inner();
-}
+const float *DeviceSlice::as_raw_inner() { return device_ptr.as_inner(); }
 
 const float *DeviceSlice::as_valid_inner() {
-  if (is_allocated()) {
-    device_ptr.alloc_mut_unchecked(size());
+  if (!is_allocated()) {
+    device_ptr.alloc_mut_unchecked(count());
+    allocated = true;
   }
   return device_ptr.as_inner();
 }
