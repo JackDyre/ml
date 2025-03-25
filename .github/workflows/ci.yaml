@@ -14,17 +14,29 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Install dependencies
+      - name: Update package lists and install core build tools
         run: |
           sudo apt-get update
-          # Install core build tools including a C++ compiler, meson and ninja-build.
+          # Install basic development tools, Meson build system and Ninja.
           sudo apt-get install -y build-essential meson ninja-build
-          # Install CUDA toolkit to get access to nvcc.
-          # Note: The package name ('cuda') might vary based on the Ubuntu version.
+
+      - name: Install CUDA Toolkit (for nvcc)
+        run: |
+          # Download and install the repository pin file for Ubuntu 22.04.
+          wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/cuda-ubuntu2204.pin
+          sudo mv cuda-ubuntu2204.pin /etc/apt/preferences.d/cuda-repository-pin-600
+          # Add the NVIDIA package repository key.
+          sudo apt-key adv --fetch-keys \
+            https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/3bf863cc.pub
+          # Add the CUDA repository.
+          echo "deb https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/ /" | \
+            sudo tee /etc/apt/sources.list.d/cuda.list
+          sudo apt-get update
+          # Install the CUDA toolkit.
           sudo apt-get install -y cuda
 
-      - name: Setup build directory with Meson
+      - name: Configure project with Meson
         run: meson setup builddir
 
-      - name: Build the project using Meson
+      - name: Build project with Meson
         run: meson compile -C builddir
