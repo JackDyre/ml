@@ -24,7 +24,9 @@ NN NN::from_sizes(std::vector<size_t> shapes) {
 }
 
 void NN::forward() { layers[0].forward_chain(input); }
+
 void NN::set_input(Matrix new_input) { input = std::move(new_input); }
+
 const Matrix NN::get_output() {
-  return layers[layers.size()].get_activations();
+  return layers[layers.size() - 1].get_activations();
 }

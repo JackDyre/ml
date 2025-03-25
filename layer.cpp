@@ -14,15 +14,16 @@ void Layer::set_next(Layer *n) { next = n; }
 
 const Matrix Layer::get_activations() { return activations; }
 
-void Layer::forward_from(Matrix &prev_acts) {
+void Layer::forward(Matrix &prev_acts) {
   preactivatons.mul_d(weights, prev_acts);
   preactivatons.add_d(biases);
   activations.relu_d(preactivatons);
 }
 
 void Layer::forward_chain(Matrix &prev_acts) {
-  forward_from(prev_acts);
+  forward(prev_acts);
+
   if (next.has_value()) {
-    next.value()->forward_from(activations);
+    next.value()->forward_chain(activations);
   }
 }

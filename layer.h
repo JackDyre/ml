@@ -25,7 +25,7 @@ public:
 
   const Matrix get_activations();
 
-  void forward_from(Matrix &prev_acts);
+  void forward(Matrix &prev_acts);
   void forward_chain(Matrix &prev_acts);
 };
 
