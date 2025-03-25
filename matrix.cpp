@@ -37,11 +37,13 @@ void Matrix::print_h() {
 void Matrix::fill_d(float val) {
   float *ptr = (float *)slice.get_device_valid_inner();
 
-  auto launch_args = MatrixFill{.ptr = ptr,
-                                .rows = shape.rows,
-                                .cols = shape.cols,
-                                .stride = stride,
-                                .val = val};
+  auto launch_args = MatrixFill{
+      .ptr = ptr,
+      .rows = shape.rows,
+      .cols = shape.cols,
+      .stride = stride,
+      .val = val,
+  };
 
   device_matrix_fill(launch_args);
 }
@@ -49,13 +51,15 @@ void Matrix::fill_d(float val) {
 void Matrix::rand_d(float low, float high) {
   float *ptr = (float *)slice.get_device_valid_inner();
 
-  auto launch_args = MatrixRand{.ptr = ptr,
-                                .rows = shape.rows,
-                                .cols = shape.cols,
-                                .stride = stride,
-                                .seed = rand(),
-                                .low = low,
-                                .high = high};
+  auto launch_args = MatrixRand{
+      .ptr = ptr,
+      .rows = shape.rows,
+      .cols = shape.cols,
+      .stride = stride,
+      .seed = rand(),
+      .low = low,
+      .high = high,
+  };
 
   device_matrix_rand(launch_args);
 }
@@ -63,16 +67,44 @@ void Matrix::rand_d(float low, float high) {
 void Matrix::add_d(Matrix &other) {
   assert(shape.rows == other.shape.rows);
   assert(shape.cols == other.shape.cols);
-  assert(stride == other.stride);
 
   float *dst_ptr = (float *)slice.get_device_valid_inner();
   float *other_ptr = (float *)other.slice.get_device_valid_inner();
 
-  auto launch_args = MatrixAdd{.dst_ptr = dst_ptr,
-                               .other_ptr = other_ptr,
-                               .rows = shape.rows,
-                               .cols = shape.cols,
-                               .stride = stride};
+  auto launch_args = MatrixAdd{
+      .dst_ptr = dst_ptr,
+      .other_ptr = other_ptr,
+      .rows = shape.rows,
+      .cols = shape.cols,
+      .dst_stride = stride,
+      .other_stride = other.stride,
+  };
 
   device_matrix_add(launch_args);
+}
+
+void Matrix::mul_d(Matrix &l, Matrix &r) {
+  assert(shape.rows == l.shape.rows);
+  assert(shape.cols == r.shape.cols);
+  assert(l.shape.cols == r.shape.rows);
+
+  float *dst_ptr = (float *)slice.get_device_valid_inner();
+  float *l_ptr = (float *)l.slice.get_device_valid_inner();
+  float *r_ptr = (float *)r.slice.get_device_valid_inner();
+
+  auto launch_args = MatrixMul{
+      .dst_ptr = dst_ptr,
+      .l_ptr = l_ptr,
+      .r_ptr = r_ptr,
+
+      .dst_rows = shape.rows,
+      .dst_cols = shape.cols,
+      .inner_dim = l.shape.cols,
+
+      .dst_stride = stride,
+      .l_stride = l.stride,
+      .r_stride = r.stride,
+  };
+
+  device_matrix_mul(launch_args);
 }

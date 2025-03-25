@@ -6,5 +6,6 @@
 void device_matrix_fill(MatrixFill args);
 void device_matrix_rand(MatrixRand args);
 void device_matrix_add(MatrixAdd args);
+void device_matrix_mul(MatrixMul args);
 
 #endif // !KERNELS_H

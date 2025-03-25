@@ -36,6 +36,7 @@ public:
   void fill_d(float val);
   void rand_d(float low, float high);
   void add_d(Matrix &other);
+  void mul_d(Matrix &l, Matrix &r);
 };
 
 #endif // !MATRIX_H
