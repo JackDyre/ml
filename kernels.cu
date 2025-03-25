@@ -28,7 +28,7 @@ __global__ void kernel_matrix_fill(MatrixFill args) {
     return;
   }
 
-  args.d_ptr[mat_idx(r, c, args.stride)] = args.val;
+  args.ptr[mat_idx(r, c, args.stride)] = args.val;
 }
 
 void device_matrix_fill(MatrixFill args) {
@@ -49,12 +49,32 @@ __global__ void kernel_matrix_rand(MatrixRand args) {
   curandState state;
   curand_init(args.seed, mat_idx(r, c, args.stride), 0, &state);
 
-  args.d_ptr[mat_idx(r, c, args.stride)] =
+  args.ptr[mat_idx(r, c, args.stride)] =
       args.low + (args.high - args.low) * curand_uniform(&state);
 }
 
 void device_matrix_rand(MatrixRand args) {
   kernel_matrix_rand<<<kernel_config(args.rows, args.cols, 1)>>>(args);
+  auto err = cudaDeviceSynchronize();
+  panic_on_cuda_error(err);
+}
+
+__global__ void kernel_matrix_add(MatrixAdd args) {
+  std::size_t r = thread_block_idx(x);
+  std::size_t c = thread_block_idx(y);
+  std::size_t z = thread_block_idx(z);
+
+  if (r >= args.rows || c >= args.cols || z != 0) {
+    return;
+  }
+
+  auto idx = mat_idx(r, c, args.stride);
+
+  args.dst_ptr[idx] += args.other_ptr[idx];
+}
+
+void device_matrix_add(MatrixAdd args) {
+  kernel_matrix_add<<<kernel_config(args.rows, args.cols, 1)>>>(args);
   auto err = cudaDeviceSynchronize();
   panic_on_cuda_error(err);
 }

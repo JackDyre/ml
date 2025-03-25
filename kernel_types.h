@@ -3,7 +3,7 @@
 
 #include <cstddef>
 typedef struct MatrixFill {
-  float *d_ptr;
+  float *ptr;
 
   std::size_t rows;
   std::size_t cols;
@@ -13,7 +13,7 @@ typedef struct MatrixFill {
 } MatrixFill;
 
 typedef struct MatrixRand {
-  float *d_ptr;
+  float *ptr;
 
   std::size_t rows;
   std::size_t cols;
@@ -24,5 +24,14 @@ typedef struct MatrixRand {
   float low;
   float high;
 } MatrixRand;
+
+typedef struct MatrixAdd {
+  float *dst_ptr;
+  float *other_ptr;
+
+  std::size_t rows;
+  std::size_t cols;
+  std::size_t stride;
+} MatrixAdd;
 
 #endif // !KERNEL_TYPES_H
