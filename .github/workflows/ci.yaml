@@ -17,23 +17,25 @@ jobs:
       - name: Update package lists and install core build tools
         run: |
           sudo apt-get update
-          # Install basic development tools, Meson build system and Ninja.
+          # Install essential build tools, Meson, and Ninja.
           sudo apt-get install -y build-essential meson ninja-build
 
       - name: Install CUDA Toolkit (for nvcc)
         run: |
-          # Download and install the repository pin file for Ubuntu 22.04.
+          # Download the repository pin file (for Ubuntu 22.04) and move it to the apt preferences.
           wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/cuda-ubuntu2204.pin
           sudo mv cuda-ubuntu2204.pin /etc/apt/preferences.d/cuda-repository-pin-600
-          # Add the NVIDIA package repository key.
-          sudo apt-key adv --fetch-keys \
-            https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/3bf863cc.pub
+          # Import NVIDIA key (apt-key is deprecated, but is still used here for simplicity).
+          sudo apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/3bf863cc.pub
           # Add the CUDA repository.
           echo "deb https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2204/x86_64/ /" | \
             sudo tee /etc/apt/sources.list.d/cuda.list
           sudo apt-get update
-          # Install the CUDA toolkit.
+          # Install CUDA. (This installs nvcc along with other tools.)
           sudo apt-get install -y cuda
+
+      - name: Add CUDA bin to PATH
+        run: echo "/usr/local/cuda/bin" >> $GITHUB_PATH
 
       - name: Configure project with Meson
         run: meson setup builddir
