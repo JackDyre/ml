@@ -1,0 +1,30 @@
+name: CI Build
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          # Install core build tools including a C++ compiler, meson and ninja-build.
+          sudo apt-get install -y build-essential meson ninja-build
+          # Install CUDA toolkit to get access to nvcc.
+          # Note: The package name ('cuda') might vary based on the Ubuntu version.
+          sudo apt-get install -y cuda
+
+      - name: Setup build directory with Meson
+        run: meson setup builddir
+
+      - name: Build the project using Meson
+        run: meson compile -C builddir
