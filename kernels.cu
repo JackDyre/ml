@@ -103,3 +103,23 @@ void device_matrix_mul(MatrixMul args) {
   auto err = cudaDeviceSynchronize();
   panic_on_cuda_error(err);
 }
+
+__global__ void kernel_matrix_relu(MatrixRelu args) {
+  std::size_t r = thread_block_idx(x);
+  std::size_t c = thread_block_idx(y);
+  std::size_t z = thread_block_idx(z);
+
+  if (r >= args.rows || c >= args.cols || z != 0) {
+    return;
+  }
+
+  auto idx = mat_idx(r, c, args.stride);
+
+  args.ptr[idx] = relu(args.ptr[idx]);
+}
+
+void device_matrix_relu(MatrixRelu args) {
+  kernel_matrix_relu<<<kernel_config(args.rows, args.cols, 1)>>>(args);
+  auto err = cudaDeviceSynchronize();
+  panic_on_cuda_error(err);
+}

@@ -7,4 +7,6 @@
 
 #define panic_on_cuda_error(err) assert(err == cudaSuccess)
 
+#define relu(x) (x) < 0 ? 0 : (x)
+
 #endif // !UTIL_H

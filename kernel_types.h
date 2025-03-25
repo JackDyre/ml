@@ -2,6 +2,7 @@
 #define KERNEL_TYPES_H
 
 #include <cstddef>
+
 typedef struct MatrixFill {
   float *ptr;
 
@@ -49,5 +50,13 @@ typedef struct MatrixMul {
   std::size_t l_stride;
   std::size_t r_stride;
 } MatrixMul;
+
+typedef struct MatrixRelu {
+  float *ptr;
+
+  std::size_t rows;
+  std::size_t cols;
+  std::size_t stride;
+} MatrixRelu;
 
 #endif // !KERNEL_TYPES_H

@@ -13,6 +13,7 @@ private:
 
 public:
   Matrix(Shape shape);
+  Matrix(std::size_t rows, std::size_t cols);
 
   // Destructor
   ~Matrix() = default;
@@ -37,6 +38,7 @@ public:
   void rand_d(float low, float high);
   void add_d(Matrix &other);
   void mul_d(Matrix &l, Matrix &r);
+  void relu_d();
 };
 
 #endif // !MATRIX_H

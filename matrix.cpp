@@ -11,6 +11,9 @@ Matrix::Matrix(Shape shape)
     : slice(DualSlice(shape.rows * shape.cols)), shape(shape),
       stride(shape.cols) {}
 
+Matrix::Matrix(std::size_t rows, std::size_t cols)
+    : Matrix(Shape{.rows = rows, .cols = cols}) {}
+
 std::size_t Matrix::elem_count() { return row_count() * col_count(); }
 
 std::size_t Matrix::row_count() { return shape.rows; }
@@ -107,4 +110,17 @@ void Matrix::mul_d(Matrix &l, Matrix &r) {
   };
 
   device_matrix_mul(launch_args);
+}
+
+void Matrix::relu_d() {
+  float *ptr = (float *)slice.get_device_valid_inner();
+
+  auto launch_args = MatrixRelu{
+      .ptr = ptr,
+      .rows = shape.rows,
+      .cols = shape.cols,
+      .stride = stride,
+  };
+
+  device_matrix_relu(launch_args);
 }
