@@ -113,6 +113,9 @@ void Matrix::mul_d(Matrix &l, Matrix &r) {
 }
 
 void Matrix::relu_d(Matrix &src) {
+  assert(shape.rows == src.shape.rows);
+  assert(shape.cols == src.shape.cols);
+
   float *src_ptr = (float *)src.slice.get_device_valid_inner();
   float *dst_ptr = (float *)slice.get_device_valid_inner();
 
