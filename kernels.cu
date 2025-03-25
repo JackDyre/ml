@@ -113,9 +113,8 @@ __global__ void kernel_matrix_relu(MatrixRelu args) {
     return;
   }
 
-  auto idx = mat_idx(r, c, args.stride);
-
-  args.ptr[idx] = relu(args.ptr[idx]);
+  args.dst_ptr[mat_idx(r, c, args.dst_stride)] =
+      relu(args.src_ptr[mat_idx(r, c, args.src_stride)]);
 }
 
 void device_matrix_relu(MatrixRelu args) {

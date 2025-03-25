@@ -112,14 +112,17 @@ void Matrix::mul_d(Matrix &l, Matrix &r) {
   device_matrix_mul(launch_args);
 }
 
-void Matrix::relu_d() {
-  float *ptr = (float *)slice.get_device_valid_inner();
+void Matrix::relu_d(Matrix &src) {
+  float *src_ptr = (float *)src.slice.get_device_valid_inner();
+  float *dst_ptr = (float *)slice.get_device_valid_inner();
 
   auto launch_args = MatrixRelu{
-      .ptr = ptr,
+      .src_ptr = src_ptr,
+      .dst_ptr = dst_ptr,
       .rows = shape.rows,
       .cols = shape.cols,
-      .stride = stride,
+      .src_stride = src.stride,
+      .dst_stride = stride,
   };
 
   device_matrix_relu(launch_args);

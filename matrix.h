@@ -38,7 +38,7 @@ public:
   void rand_d(float low, float high);
   void add_d(Matrix &other);
   void mul_d(Matrix &l, Matrix &r);
-  void relu_d();
+  void relu_d(Matrix &src);
 };
 
 #endif // !MATRIX_H

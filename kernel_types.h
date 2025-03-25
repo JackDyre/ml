@@ -52,11 +52,14 @@ typedef struct MatrixMul {
 } MatrixMul;
 
 typedef struct MatrixRelu {
-  float *ptr;
+  float *src_ptr;
+  float *dst_ptr;
 
   std::size_t rows;
   std::size_t cols;
-  std::size_t stride;
+
+  std::size_t src_stride;
+  std::size_t dst_stride;
 } MatrixRelu;
 
 #endif // !KERNEL_TYPES_H
