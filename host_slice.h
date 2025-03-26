@@ -10,11 +10,13 @@ private:
 
 public:
   // Constructors
-  HostSlice(std::size_t count);
-  HostSlice(HostPtr host_ptr, std::size_t count);
+  HostSlice(std::size_t count) : Slice(count, false), host_ptr() {}
+  HostSlice(HostPtr host_ptr, std::size_t count)
+      : Slice(count, true), host_ptr(std::move(host_ptr)) {}
 
   // Move constructor
-  HostSlice(HostSlice &&other) noexcept;
+  HostSlice(HostSlice &&other) noexcept
+      : Slice(std::move(other)), host_ptr(std::move(other.host_ptr)) {}
   // Move assignment operator
   HostSlice &operator=(HostSlice &&other) noexcept;
 

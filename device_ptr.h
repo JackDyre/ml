@@ -6,9 +6,9 @@
 
 class DevicePtr : public Ptr {
 public:
-  DevicePtr();
-  explicit DevicePtr(float *ptr);
-  DevicePtr(DevicePtr &&other) noexcept;
+  DevicePtr() : Ptr() {}
+  explicit DevicePtr(float *ptr) : Ptr(ptr) {}
+  DevicePtr(DevicePtr &&other) noexcept : Ptr(std::move(other)) {}
   DevicePtr &operator=(DevicePtr &&other) noexcept;
   ~DevicePtr() override;
 

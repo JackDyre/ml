@@ -1,7 +1,5 @@
 #include "slice.h"
 
-Slice::Slice(std::size_t count, bool allocated)
-    : _count(count), allocated(allocated) {}
 
 // Move constructor
 Slice::Slice(Slice &&other) noexcept

@@ -9,14 +9,14 @@ private:
   float *_inner;
 
 public:
-  Ptr();
-  explicit Ptr(float *ptr);
+  Ptr() : _inner(nullptr) {}
+  explicit Ptr(float *ptr) : _inner(ptr) {}
 
   const float *as_inner();
   bool is_null();
   void alloc_mut_unchecked(std::size_t size);
 
-  virtual ~Ptr();
+  virtual ~Ptr() = default;
 
   // Delete copy operations
   Ptr(const Ptr &) = delete;

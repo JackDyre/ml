@@ -7,9 +7,9 @@
 
 class HostPtr : public Ptr {
 public:
-  HostPtr();
-  explicit HostPtr(float *ptr);
-  HostPtr(HostPtr &&other) noexcept;
+  HostPtr() : Ptr() {}
+  explicit HostPtr(float *ptr) : Ptr(ptr) {}
+  HostPtr(HostPtr &&other) noexcept : Ptr(std::move(other)) {}
   HostPtr &operator=(HostPtr &&other) noexcept;
   ~HostPtr() override;
 

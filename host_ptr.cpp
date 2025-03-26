@@ -1,11 +1,6 @@
 #include "host_ptr.h"
 #include <cassert>
 
-HostPtr::HostPtr() : Ptr() {}
-
-HostPtr::HostPtr(float *ptr) : Ptr(ptr) {}
-
-HostPtr::HostPtr(HostPtr &&other) noexcept : Ptr(std::move(other)) {}
 
 HostPtr &HostPtr::operator=(HostPtr &&other) noexcept {
   Ptr::operator=(std::move(other));

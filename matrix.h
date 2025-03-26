@@ -12,8 +12,11 @@ private:
   std::size_t stride;
 
 public:
-  Matrix(Shape shape);
-  Matrix(std::size_t rows, std::size_t cols);
+  Matrix(Shape shape)
+      : slice(DualSlice(shape.rows * shape.cols)), shape(shape),
+        stride(shape.cols) {}
+  Matrix(std::size_t rows, std::size_t cols)
+      : Matrix(Shape{.rows = rows, .cols = cols}) {}
 
   // Destructor
   ~Matrix() = default;

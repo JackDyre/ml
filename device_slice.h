@@ -10,11 +10,14 @@ private:
 
 public:
   // Constructors
-  DeviceSlice(std::size_t count);
-  DeviceSlice(DevicePtr device_ptr, std::size_t count);
+  DeviceSlice(std::size_t count)
+      : Slice(count, false), device_ptr() {}
+  DeviceSlice(DevicePtr device_ptr, std::size_t count)
+      : Slice(count, true), device_ptr(std::move(device_ptr)) {}
 
   // Move constructor
-  DeviceSlice(DeviceSlice &&other) noexcept;
+  DeviceSlice(DeviceSlice &&other) noexcept
+      : Slice(std::move(other)), device_ptr(std::move(other.device_ptr)) {}
   // Move assignment operator
   DeviceSlice &operator=(DeviceSlice &&other) noexcept;
 

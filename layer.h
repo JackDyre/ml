@@ -16,9 +16,25 @@ private:
   std::optional<Layer *> next;
 
 public:
-  Layer(std::size_t size, std::size_t prev_size);
+  // Constructors
+  Layer(std::size_t size, std::size_t prev_size)
+      : Layer(Matrix(size, prev_size), Matrix(size, 1), Matrix(size, 1),
+             Matrix(size, 1)) {}
   Layer(Matrix weights, Matrix biases, Matrix preactivatons,
-        Matrix activations);
+        Matrix activations)
+      : weights(weights), biases(biases), preactivatons(preactivatons),
+        activations(activations) {}
+
+  // Destructor
+  ~Layer() = default;
+  // Copy constructor
+  Layer(const Layer &other) = default;
+  // Copy assignment
+  Layer &operator=(const Layer &other) = default;
+  // Move constructor
+  Layer(Layer &&other) noexcept = default;
+  // Move assignment
+  Layer &operator=(Layer &&other) noexcept = default;
 
   void set_prev(Layer *p);
   void set_next(Layer *n);

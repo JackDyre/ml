@@ -1,17 +1,12 @@
 #include "ptr.h"
 #include <cstddef>
 
-Ptr::Ptr() : _inner(nullptr) {}
-
-Ptr::Ptr(float *ptr) : _inner(ptr) {}
 
 const float *Ptr::as_inner() { return _inner; }
 
 bool Ptr::is_null() { return _inner == nullptr; }
 
 void Ptr::alloc_mut_unchecked(std::size_t size) { _inner = _alloc(size); }
-
-Ptr::~Ptr() = default;
 
 Ptr::Ptr(Ptr &&other) noexcept : _inner(other._inner) {
   other._inner = nullptr;

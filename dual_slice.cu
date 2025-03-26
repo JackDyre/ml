@@ -1,25 +1,6 @@
 #include "dual_slice.h"
 #include "util.h"
 
-DualSlice::DualSlice(std::size_t count)
-    : host_slice(std::make_shared<HostSlice>(count)),
-      device_slice(std::make_shared<DeviceSlice>(count)), state(_OPT_NONE) {}
-
-DualSlice::DualSlice(HostSlice host_slice)
-    : host_slice(std::make_shared<HostSlice>(std::move(host_slice))),
-      device_slice(std::make_shared<DeviceSlice>(host_slice.count())),
-      state(_OPT_HOST) {}
-
-DualSlice::DualSlice(DeviceSlice device_slice)
-    : host_slice(std::make_shared<HostSlice>(device_slice.count())),
-      device_slice(std::make_shared<DeviceSlice>(std::move(device_slice))),
-      state(_OPT_DEVICE) {}
-
-DualSlice::DualSlice(HostSlice host_slice, DeviceSlice device_slice,
-                     DeviceOpt state)
-    : host_slice(std::make_shared<HostSlice>(std::move(host_slice))),
-      device_slice(std::make_shared<DeviceSlice>(std::move(device_slice))),
-      state(state) {}
 
 void DualSlice::ensure_on_host() {
   switch (state) {

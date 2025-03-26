@@ -8,7 +8,8 @@ protected:
   std::size_t _count;
   bool allocated = false;
 
-  explicit Slice(std::size_t count, bool allocated);
+  explicit Slice(std::size_t count, bool allocated)
+      : _count(count), allocated(allocated) {}
 
 public:
   // Destructor

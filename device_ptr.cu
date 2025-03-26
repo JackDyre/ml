@@ -1,11 +1,6 @@
 #include "device_ptr.h"
 #include <cassert>
 
-DevicePtr::DevicePtr() : Ptr() {}
-
-DevicePtr::DevicePtr(float *ptr) : Ptr(ptr) {}
-
-DevicePtr::DevicePtr(DevicePtr &&other) noexcept : Ptr(std::move(other)) {}
 
 DevicePtr &DevicePtr::operator=(DevicePtr &&other) noexcept {
   Ptr::operator=(std::move(other));

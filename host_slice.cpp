@@ -1,14 +1,5 @@
 #include "host_slice.h"
 
-// Constructors
-HostSlice::HostSlice(std::size_t count) : Slice(count, false), host_ptr() {}
-
-HostSlice::HostSlice(HostPtr host_ptr, std::size_t count)
-    : Slice(count, true), host_ptr(std::move(host_ptr)) {}
-
-// Move constructor
-HostSlice::HostSlice(HostSlice &&other) noexcept
-    : Slice(std::move(other)), host_ptr(std::move(other.host_ptr)) {}
 
 // Move assignment operator
 HostSlice &HostSlice::operator=(HostSlice &&other) noexcept {

@@ -12,8 +12,6 @@ NN::NN(std::vector<Layer> layers, Matrix input) : input(input), layers(layers) {
   }
 }
 
-NN::NN(std::vector<Layer> layers, size_t input_size)
-    : NN(layers, Matrix(input_size, 1)) {}
 
 NN NN::from_sizes(std::vector<size_t> shapes) {
   auto input_size = shapes[0];

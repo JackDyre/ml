@@ -1,15 +1,5 @@
 #include "device_slice.h"
 
-// Constructors
-DeviceSlice::DeviceSlice(std::size_t count)
-    : Slice(count, false), device_ptr() {}
-
-DeviceSlice::DeviceSlice(DevicePtr device_ptr, std::size_t count)
-    : Slice(count, true), device_ptr(std::move(device_ptr)) {}
-
-// Move constructor
-DeviceSlice::DeviceSlice(DeviceSlice &&other) noexcept
-    : Slice(std::move(other)), device_ptr(std::move(other.device_ptr)) {}
 
 // Move assignment operator
 DeviceSlice &DeviceSlice::operator=(DeviceSlice &&other) noexcept {
