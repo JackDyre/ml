@@ -1,8 +1,8 @@
 #include "layer.h"
+#include <memory>
 
-
-void Layer::set_prev(Layer *p) { prev = p; }
-void Layer::set_next(Layer *n) { next = n; }
+void Layer::set_prev(std::shared_ptr<Layer> p) { prev = p; }
+void Layer::set_next(std::shared_ptr<Layer> n) { next = n; }
 
 const Matrix Layer::get_activations() { return activations; }
 

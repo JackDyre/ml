@@ -3,6 +3,7 @@
 
 #include "matrix.h"
 #include <cstddef>
+#include <memory>
 #include <optional>
 
 class Layer {
@@ -12,8 +13,8 @@ private:
   Matrix preactivatons;
   Matrix activations;
 
-  std::optional<Layer *> prev;
-  std::optional<Layer *> next;
+  std::optional<std::shared_ptr<Layer>> prev;
+  std::optional<std::shared_ptr<Layer>> next;
 
 public:
   // Constructors
@@ -36,8 +37,8 @@ public:
   // Move assignment
   Layer &operator=(Layer &&other) noexcept = default;
 
-  void set_prev(Layer *p);
-  void set_next(Layer *n);
+  void set_prev(std::shared_ptr<Layer> p);
+  void set_next(std::shared_ptr<Layer> n);
 
   const Matrix get_activations();
 

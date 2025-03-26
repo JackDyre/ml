@@ -4,19 +4,20 @@
 #include "layer.h"
 #include "matrix.h"
 #include <cstddef>
+#include <memory>
 #include <vector>
 
 class NN {
 private:
   Matrix input;
-  std::vector<Layer> layers;
+
+  std::shared_ptr<Layer> first;
+  std::shared_ptr<Layer> last;
+
+  NN(std::shared_ptr<Layer> first, std::shared_ptr<Layer> last, Matrix input)
+      : first(first), last(last), input(input) {};
 
 public:
-  // Constructors
-  NN(std::vector<Layer> layers, Matrix input);
-  NN(std::vector<Layer> layers, size_t input_size)
-      : NN(layers, Matrix(input_size, 1)) {}
-
   // Destructor
   ~NN() = default;
   // Copy constructor
