@@ -15,7 +15,7 @@ private:
   std::shared_ptr<Layer> last;
 
   NN(std::shared_ptr<Layer> first, std::shared_ptr<Layer> last, Matrix input)
-      : first(first), last(last), input(input) {};
+      : input(input), first(first), last(last) {};
 
 public:
   // Destructor
