@@ -20,9 +20,8 @@ public:
   // Constructors
   Layer(std::size_t size, std::size_t prev_size)
       : Layer(Matrix(size, prev_size), Matrix(size, 1), Matrix(size, 1),
-             Matrix(size, 1)) {}
-  Layer(Matrix weights, Matrix biases, Matrix preactivatons,
-        Matrix activations)
+              Matrix(size, 1)) {}
+  Layer(Matrix weights, Matrix biases, Matrix preactivatons, Matrix activations)
       : weights(weights), biases(biases), preactivatons(preactivatons),
         activations(activations) {}
 

@@ -1,6 +1,5 @@
 #include "slice.h"
 
-
 // Move constructor
 Slice::Slice(Slice &&other) noexcept
     : _count(other._count), allocated(other.allocated) {

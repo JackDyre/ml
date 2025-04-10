@@ -1,7 +1,6 @@
 #include "dual_slice.h"
 #include "util.h"
 
-
 void DualSlice::ensure_on_host() {
   switch (state) {
   case _OPT_HOST:

@@ -1,7 +1,6 @@
 #include "host_ptr.h"
 #include <cassert>
 
-
 HostPtr &HostPtr::operator=(HostPtr &&other) noexcept {
   Ptr::operator=(std::move(other));
   return *this;

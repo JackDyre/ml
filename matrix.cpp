@@ -7,7 +7,6 @@
 #include <iostream>
 #include <ostream>
 
-
 std::size_t Matrix::elem_count() { return row_count() * col_count(); }
 
 std::size_t Matrix::row_count() { return shape.rows; }

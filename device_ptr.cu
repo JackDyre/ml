@@ -1,7 +1,6 @@
 #include "device_ptr.h"
 #include <cassert>
 
-
 DevicePtr &DevicePtr::operator=(DevicePtr &&other) noexcept {
   Ptr::operator=(std::move(other));
   return *this;

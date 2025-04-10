@@ -10,8 +10,7 @@ private:
 
 public:
   // Constructors
-  DeviceSlice(std::size_t count)
-      : Slice(count, false), device_ptr() {}
+  DeviceSlice(std::size_t count) : Slice(count, false), device_ptr() {}
   DeviceSlice(DevicePtr device_ptr, std::size_t count)
       : Slice(count, true), device_ptr(std::move(device_ptr)) {}
 

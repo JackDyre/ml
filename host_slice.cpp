@@ -1,6 +1,5 @@
 #include "host_slice.h"
 
-
 // Move assignment operator
 HostSlice &HostSlice::operator=(HostSlice &&other) noexcept {
   if (this != &other) {

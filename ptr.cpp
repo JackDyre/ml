@@ -1,7 +1,6 @@
 #include "ptr.h"
 #include <cstddef>
 
-
 const float *Ptr::as_inner() { return _inner; }
 
 bool Ptr::is_null() { return _inner == nullptr; }

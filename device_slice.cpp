@@ -1,6 +1,5 @@
 #include "device_slice.h"
 
-
 // Move assignment operator
 DeviceSlice &DeviceSlice::operator=(DeviceSlice &&other) noexcept {
   if (this != &other) {
