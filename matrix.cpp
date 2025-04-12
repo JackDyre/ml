@@ -14,11 +14,8 @@ std::size_t Matrix::row_count() { return shape.rows; }
 
 std::size_t Matrix::col_count() { return shape.cols; }
 
-std::size_t Matrix::get_stride() { return stride; }
-
 void Matrix::print_h() {
   const float *ptr = slice.get_host_valid_inner();
-  auto idx_spec = IndexSpec{.stride = stride, .ptr_offset = ptr_offset};
 
   std::cout << std::fixed << std::setprecision(5);
   std::cout << "[" << std::endl;
@@ -36,11 +33,6 @@ void Matrix::print_h() {
 void Matrix::fill_d(float val) {
   float *ptr = (float *)slice.get_device_valid_inner();
 
-  auto idx_spec = IndexSpec{
-      .stride = stride,
-      .ptr_offset = ptr_offset,
-  };
-
   auto launch_args = MatrixFill{
       .ptr = ptr,
       .shape = shape,
@@ -53,11 +45,6 @@ void Matrix::fill_d(float val) {
 
 void Matrix::rand_d(float low, float high) {
   float *ptr = (float *)slice.get_device_valid_inner();
-
-  auto idx_spec = IndexSpec{
-      .stride = stride,
-      .ptr_offset = ptr_offset,
-  };
 
   auto launch_args = MatrixRand{
       .ptr = ptr,
@@ -78,13 +65,13 @@ void Matrix::add_d(Matrix &l, Matrix &r) {
   assert(r.shape.cols == l.shape.cols);
 
   float *dst_ptr = (float *)slice.get_device_valid_inner();
-  auto dst_idx_spec = IndexSpec{.stride = stride, .ptr_offset = ptr_offset};
+  auto dst_idx_spec = idx_spec;
 
   float *l_ptr = (float *)l.slice.get_device_valid_inner();
-  auto l_idx_spec = IndexSpec{.stride = l.stride, .ptr_offset = l.ptr_offset};
+  auto l_idx_spec = l.idx_spec;
 
   float *r_ptr = (float *)r.slice.get_device_valid_inner();
-  auto r_idx_spec = IndexSpec{.stride = r.stride, .ptr_offset = r.ptr_offset};
+  auto r_idx_spec = r.idx_spec;
 
   auto launch_args = MatrixAdd{
       .dst_ptr = dst_ptr,
@@ -105,13 +92,13 @@ void Matrix::mul_d(Matrix &l, Matrix &r) {
   assert(l.shape.cols == r.shape.rows);
 
   float *dst_ptr = (float *)slice.get_device_valid_inner();
-  auto dst_idx_spec = IndexSpec{.stride = stride, .ptr_offset = ptr_offset};
+  auto dst_idx_spec = idx_spec;
 
   float *l_ptr = (float *)l.slice.get_device_valid_inner();
-  auto l_idx_spec = IndexSpec{.stride = l.stride, .ptr_offset = l.ptr_offset};
+  auto l_idx_spec = l.idx_spec;
 
   float *r_ptr = (float *)r.slice.get_device_valid_inner();
-  auto r_idx_spec = IndexSpec{.stride = r.stride, .ptr_offset = r.ptr_offset};
+  auto r_idx_spec = r.idx_spec;
 
   auto launch_args = MatrixMul{
       .dst_ptr = dst_ptr,
@@ -132,13 +119,10 @@ void Matrix::relu_d(Matrix &src) {
   assert(shape.cols == src.shape.cols);
 
   float *src_ptr = (float *)src.slice.get_device_valid_inner();
-  auto src_idx_spec = IndexSpec{
-      .stride = src.stride,
-      .ptr_offset = src.ptr_offset,
-  };
+  auto src_idx_spec = src.idx_spec;
 
   float *dst_ptr = (float *)slice.get_device_valid_inner();
-  auto dst_idx_spec = IndexSpec{.stride = stride, .ptr_offset = ptr_offset};
+  auto dst_idx_spec = idx_spec;
 
   auto launch_args = MatrixRelu{
       .src_ptr = src_ptr,
@@ -158,13 +142,13 @@ void Matrix::se_d(Matrix &a, Matrix &b) {
   assert(shape.cols == a.shape.cols);
 
   float *dst_ptr = (float *)slice.get_device_valid_inner();
-  auto dst_idx_spec = IndexSpec{.stride = stride, .ptr_offset = ptr_offset};
+  auto dst_idx_spec = idx_spec;
 
   float *a_ptr = (float *)a.slice.get_device_valid_inner();
-  auto a_idx_spec = IndexSpec{.stride = a.stride, .ptr_offset = a.ptr_offset};
+  auto a_idx_spec = a.idx_spec;
 
   float *b_ptr = (float *)b.slice.get_device_valid_inner();
-  auto b_idx_spec = IndexSpec{.stride = b.stride, .ptr_offset = b.ptr_offset};
+  auto b_idx_spec = b.idx_spec;
 
   auto launch_args = MatrixSE{
       .dst_ptr = dst_ptr,
@@ -181,13 +165,10 @@ void Matrix::se_d(Matrix &a, Matrix &b) {
 
 void Matrix::relu_deriv_d(Matrix &src) {
   float *src_ptr = (float *)src.slice.get_device_valid_inner();
-  auto src_idx_spec = IndexSpec{
-      .stride = src.stride,
-      .ptr_offset = src.ptr_offset,
-  };
+  auto src_idx_spec = src.idx_spec;
 
   float *dst_ptr = (float *)slice.get_device_valid_inner();
-  auto dst_idx_spec = IndexSpec{.stride = stride, .ptr_offset = ptr_offset};
+  auto dst_idx_spec = idx_spec;
 
   auto launch_args = MatrixReluDeriv{
       .src_ptr = src_ptr,

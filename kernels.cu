@@ -6,7 +6,6 @@
 #include <curand_kernel.h>
 
 #define thread_block_idx(dim) blockDim.dim *blockIdx.dim + threadIdx.dim
-#define panic_on_cuda_error(err) assert(err == cudaSuccess)
 
 const auto THREADS_PER_BLOCK = dim3(16, 16, 16);
 

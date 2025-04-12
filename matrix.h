@@ -9,13 +9,10 @@ class Matrix {
 private:
   DualSlice slice;
   Shape shape;
+  IndexSpec idx_spec = IndexSpec{.stride = shape.rows, .ptr_offset = 0};
 
-  std::size_t ptr_offset = 0;
-  std::size_t stride = shape.cols;
-
-  Matrix(DualSlice slice, Shape shape, std::size_t ptr_offset,
-         std::size_t stride)
-      : slice(slice), shape(shape), ptr_offset(ptr_offset), stride(stride) {}
+  Matrix(DualSlice slice, Shape shape, IndexSpec idx_spec)
+      : slice(slice), shape(shape), idx_spec(idx_spec) {}
 
 public:
   Matrix(Shape shape)
@@ -40,7 +37,6 @@ public:
   std::size_t elem_count();
   std::size_t row_count();
   std::size_t col_count();
-  std::size_t get_stride();
 
   void print_h();
   void fill_d(float val);
