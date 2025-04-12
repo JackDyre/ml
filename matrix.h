@@ -9,12 +9,18 @@ class Matrix {
 private:
   DualSlice slice;
   Shape shape;
-  std::size_t stride;
+
+  std::size_t ptr_offset = 0;
+  std::size_t stride = shape.cols;
+
+  Matrix(DualSlice slice, Shape shape, std::size_t ptr_offset,
+         std::size_t stride)
+      : slice(slice), shape(shape), ptr_offset(ptr_offset), stride(stride) {}
 
 public:
   Matrix(Shape shape)
-      : slice(DualSlice(shape.rows * shape.cols)), shape(shape),
-        stride(shape.cols) {}
+      : slice(DualSlice(shape.rows * shape.cols)), shape(shape) {}
+
   Matrix(std::size_t rows, std::size_t cols)
       : Matrix(Shape{.rows = rows, .cols = cols}) {}
 
@@ -39,9 +45,12 @@ public:
   void print_h();
   void fill_d(float val);
   void rand_d(float low, float high);
-  void add_d(Matrix &other);
+  void add_d(Matrix &l, Matrix &r);
   void mul_d(Matrix &l, Matrix &r);
   void relu_d(Matrix &src);
+  void se_d(Matrix &a, Matrix &b);
+  void relu_deriv_d(Matrix &src);
+
 };
 
 #endif // !MATRIX_H

@@ -25,4 +25,9 @@ typedef enum DeviceOpt {
   _OPT_NONE,
 } DeviceOpt;
 
+typedef struct IndexSpec {
+  std::size_t stride;
+  std::size_t ptr_offset;
+} IndexSpec;
+
 #endif // TYPES_H

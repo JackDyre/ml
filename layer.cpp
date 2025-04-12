@@ -8,7 +8,7 @@ const Matrix Layer::get_activations() { return activations; }
 
 void Layer::forward(Matrix &prev_acts) {
   preactivatons.mul_d(weights, prev_acts);
-  preactivatons.add_d(biases);
+  preactivatons.add_d(preactivatons, biases);
   activations.relu_d(preactivatons);
 }
 

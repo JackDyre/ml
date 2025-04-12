@@ -1,3 +1,4 @@
+#include "kernel_types.h"
 #include "kernels.h"
 #include "util.h"
 #include <cassert>
@@ -25,15 +26,17 @@ __global__ void kernel_matrix_fill(MatrixFill args) {
   std::size_t c = thread_block_idx(y);
   std::size_t z = thread_block_idx(z);
 
-  if (r >= args.rows || c >= args.cols || z != 0) {
+  if (r >= args.shape.rows || c >= args.shape.cols || z != 0) {
     return;
   }
 
-  args.ptr[mat_idx(r, c, args.stride)] = args.val;
+  args.ptr[mat_idx_spec(r, c, args.idx_spec)] = args.val;
 }
 
 void device_matrix_fill(MatrixFill args) {
-  kernel_matrix_fill<<<kernel_config(args.rows, args.cols, 1)>>>(args);
+  auto l_rows = args.shape.rows;
+  auto l_cols = args.shape.cols;
+  kernel_matrix_fill<<<kernel_config(l_rows, l_cols, 1)>>>(args);
   auto err = cudaDeviceSynchronize();
   panic_on_cuda_error(err);
 }
@@ -43,19 +46,22 @@ __global__ void kernel_matrix_rand(MatrixRand args) {
   std::size_t c = thread_block_idx(y);
   std::size_t z = thread_block_idx(z);
 
-  if (r >= args.rows || c >= args.cols || z != 0) {
+  if (r >= args.shape.rows || c >= args.shape.cols || z != 0) {
     return;
   }
 
-  curandState state;
-  curand_init(args.seed, mat_idx(r, c, args.stride), 0, &state);
+  auto idx = mat_idx_spec(r, c, args.idx_spec);
 
-  args.ptr[mat_idx(r, c, args.stride)] =
-      args.low + (args.high - args.low) * curand_uniform(&state);
+  curandState state;
+  curand_init(args.seed, idx, 0, &state);
+
+  args.ptr[idx] = args.low + (args.high - args.low) * curand_uniform(&state);
 }
 
 void device_matrix_rand(MatrixRand args) {
-  kernel_matrix_rand<<<kernel_config(args.rows, args.cols, 1)>>>(args);
+  auto l_rows = args.shape.rows;
+  auto l_cols = args.shape.cols;
+  kernel_matrix_rand<<<kernel_config(l_rows, l_cols, 1)>>>(args);
   auto err = cudaDeviceSynchronize();
   panic_on_cuda_error(err);
 }
@@ -65,17 +71,20 @@ __global__ void kernel_matrix_add(MatrixAdd args) {
   std::size_t c = thread_block_idx(y);
   std::size_t z = thread_block_idx(z);
 
-  if (r >= args.rows || c >= args.cols || z != 0) {
+  if (r >= args.shape.rows || c >= args.shape.cols || z != 0) {
     return;
   }
 
-  auto other_val = args.other_ptr[mat_idx(r, c, args.other_stride)];
+  auto l_val = args.l_ptr[mat_idx_spec(r, c, args.l_idx_spec)];
+  auto r_val = args.r_ptr[mat_idx_spec(r, c, args.r_idx_spec)];
 
-  args.dst_ptr[mat_idx(r, c, args.dst_stride)] += other_val;
+  args.dst_ptr[mat_idx_spec(r, c, args.dst_idx_spec)] = l_val + r_val;
 }
 
 void device_matrix_add(MatrixAdd args) {
-  kernel_matrix_add<<<kernel_config(args.rows, args.cols, 1)>>>(args);
+  auto l_rows = args.shape.rows;
+  auto l_cols = args.shape.cols;
+  kernel_matrix_add<<<kernel_config(l_rows, l_cols, 1)>>>(args);
   auto err = cudaDeviceSynchronize();
   panic_on_cuda_error(err);
 }
@@ -85,21 +94,23 @@ __global__ void kernel_matrix_mul(MatrixMul args) {
   std::size_t c = thread_block_idx(y);
   std::size_t z = thread_block_idx(z);
 
-  if (r >= args.dst_rows || c >= args.dst_cols || z != 0) {
+  if (r >= args.shape.rows || c >= args.shape.cols || z != 0) {
     return;
   }
 
   float val = 0.0f;
   for (std::size_t i = 0; i < args.inner_dim; i++) {
-    float left_val = args.l_ptr[mat_idx(r, i, args.l_stride)];
-    float right_val = args.r_ptr[mat_idx(i, c, args.r_stride)];
+    float left_val = args.l_ptr[mat_idx_spec(r, i, args.l_idx_spec)];
+    float right_val = args.r_ptr[mat_idx_spec(i, c, args.r_idx_spec)];
     val += left_val * right_val;
   }
-  args.dst_ptr[mat_idx(r, c, args.dst_stride)] = val;
+  args.dst_ptr[mat_idx_spec(r, c, args.dst_idx_spec)] = val;
 }
 
 void device_matrix_mul(MatrixMul args) {
-  kernel_matrix_mul<<<kernel_config(args.dst_rows, args.dst_cols, 1)>>>(args);
+  auto l_rows = args.shape.rows;
+  auto l_cols = args.shape.cols;
+  kernel_matrix_mul<<<kernel_config(l_rows, l_cols, 1)>>>(args);
   auto err = cudaDeviceSynchronize();
   panic_on_cuda_error(err);
 }
@@ -109,16 +120,62 @@ __global__ void kernel_matrix_relu(MatrixRelu args) {
   std::size_t c = thread_block_idx(y);
   std::size_t z = thread_block_idx(z);
 
-  if (r >= args.rows || c >= args.cols || z != 0) {
+  if (r >= args.shape.rows || c >= args.shape.cols || z != 0) {
     return;
   }
 
-  args.dst_ptr[mat_idx(r, c, args.dst_stride)] =
-      relu(args.src_ptr[mat_idx(r, c, args.src_stride)]);
+  args.dst_ptr[mat_idx_spec(r, c, args.dst_idx_spec)] =
+      relu(args.src_ptr[mat_idx_spec(r, c, args.src_idx_spec)]);
 }
 
 void device_matrix_relu(MatrixRelu args) {
-  kernel_matrix_relu<<<kernel_config(args.rows, args.cols, 1)>>>(args);
+  auto l_rows = args.shape.rows;
+  auto l_cols = args.shape.cols;
+  kernel_matrix_relu<<<kernel_config(l_rows, l_cols, 1)>>>(args);
+  auto err = cudaDeviceSynchronize();
+  panic_on_cuda_error(err);
+}
+
+__global__ void kernel_matrix_se(MatrixSE args) {
+  std::size_t r = thread_block_idx(x);
+  std::size_t c = thread_block_idx(y);
+  std::size_t z = thread_block_idx(z);
+
+  if (r >= args.shape.rows || c >= args.shape.cols || z != 0) {
+    return;
+  }
+
+  auto diff = args.a_ptr[mat_idx_spec(r, c, args.a_idx_spec)] -
+              args.b_ptr[mat_idx_spec(r, c, args.b_idx_spec)];
+
+  args.dst_ptr[mat_idx_spec(r, c, args.dst_idx_spec)] = diff * diff;
+}
+
+void device_matrix_se(MatrixSE args) {
+  auto l_rows = args.shape.rows;
+  auto l_cols = args.shape.cols;
+  kernel_matrix_se<<<kernel_config(l_rows, l_cols, 1)>>>(args);
+  auto err = cudaDeviceSynchronize();
+  panic_on_cuda_error(err);
+}
+
+__global__ void kernel_matrix_relu_deriv(MatrixReluDeriv args) {
+  std::size_t r = thread_block_idx(x);
+  std::size_t c = thread_block_idx(y);
+  std::size_t z = thread_block_idx(z);
+
+  if (r >= args.shape.rows || c >= args.shape.cols || z != 0) {
+    return;
+  }
+
+  args.dst_ptr[mat_idx_spec(r, c, args.dst_idx_spec)] =
+      relu_deriv(args.src_ptr[mat_idx_spec(r, c, args.src_idx_spec)]);
+}
+
+void device_matrix_relu_deriv(MatrixReluDeriv args) {
+  auto l_rows = args.shape.rows;
+  auto l_cols = args.shape.cols;
+  kernel_matrix_relu_deriv<<<kernel_config(l_rows, l_cols, 1)>>>(args);
   auto err = cudaDeviceSynchronize();
   panic_on_cuda_error(err);
 }
