@@ -3,7 +3,6 @@
 #include <cstddef>
 #include <iostream>
 #include <memory>
-#include <utility>
 #include <vector>
 
 NN NN::from_sizes_vec(std::vector<size_t> shapes) {
@@ -42,7 +41,7 @@ void NN::back_prop(NN &grad_nn, Matrix &target) {
   last->backprop_chain_from_target(*grad_nn.last, target, input);
 }
 
-void NN::set_input(Matrix &new_input) { input = std::move(new_input); }
+void NN::set_input(Matrix &new_input) { input = new_input; }
 
 const Matrix NN::get_output() { return last->get_activations(); }
 
@@ -57,3 +56,5 @@ void NN::print() {
 
   first->print_chain(0);
 }
+
+void NN::step(NN &grad_nn, float lr) { first->step_chain(*grad_nn.first, lr); }

@@ -108,4 +108,15 @@ typedef struct MatrixWeightGrad {
   IndexSpec a_prev_idx_spec;
 } MatrixWeightGrad;
 
+typedef struct MatrixStep {
+  float *dst_ptr;
+  float *src_ptr;
+  float *grad_ptr;
+  Shape shape;
+  IndexSpec dst_idx_spec;
+  IndexSpec src_idx_spec;
+  IndexSpec grad_idx_spec;
+  float lr;
+} MatrixStep;
+
 #endif // !KERNEL_TYPES_H

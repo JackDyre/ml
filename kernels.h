@@ -14,5 +14,6 @@ void device_matrix_elem_wise_mul(MatrixElemWiseMul args);
 void device_matrix_grad_act(MatrixActGrad args);
 void device_matrix_se_deriv(MatrixSEDeriv args);
 void device_matrix_grad_weight(MatrixWeightGrad args);
+void device_matrix_step(MatrixStep args);
 
 #endif // !KERNELS_H

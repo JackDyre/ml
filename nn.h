@@ -38,6 +38,7 @@ public:
   const Matrix get_output();
   void random(float low, float high);
   void print();
+  void step(NN &grad_nn, float lr);
 };
 
 #endif // !NN_H

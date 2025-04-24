@@ -311,3 +311,27 @@ void Matrix::weight_grad_d(Matrix &grad_b, Matrix &prev_a) {
 
   device_matrix_grad_weight(launch_args);
 }
+
+void Matrix::step_d(Matrix &src, Matrix &grad, float lr) {
+  float *dst_ptr = (float *)slice.get_device_valid_inner();
+  auto dst_idx_spec = idx_spec;
+
+  float *src_ptr = (float *)src.slice.get_device_valid_inner();
+  auto src_idx_spec = src.idx_spec;
+
+  float *grad_ptr = (float *)grad.slice.get_device_valid_inner();
+  auto grad_idx_spec = grad.idx_spec;
+
+  auto launch_args = MatrixStep{
+      .dst_ptr = dst_ptr,
+      .src_ptr = src_ptr,
+      .grad_ptr = grad_ptr,
+      .shape = shape,
+      .dst_idx_spec = dst_idx_spec,
+      .src_idx_spec = src_idx_spec,
+      .grad_idx_spec = grad_idx_spec,
+      .lr = lr,
+  };
+
+  device_matrix_step(launch_args);
+}

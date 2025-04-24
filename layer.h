@@ -53,6 +53,9 @@ public:
 
   void print(size_t layer_idx);
   void print_chain(size_t layer_idx);
+
+  void step(Layer &grad, float lr);
+  void step_chain(Layer &grad, float lr);
 };
 
 #endif // !LAYER_H

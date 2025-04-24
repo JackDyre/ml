@@ -277,3 +277,27 @@ void device_matrix_grad_weight(MatrixWeightGrad args) {
   auto err = cudaDeviceSynchronize();
   panic_on_cuda_error(err);
 }
+
+__global__ void kernel_matrix_step(MatrixStep args) {
+  std::size_t r = thread_block_idx(x);
+  std::size_t c = thread_block_idx(y);
+  std::size_t z = thread_block_idx(z);
+
+  if (r >= args.shape.rows || c >= args.shape.cols || z != 0) {
+    return;
+  }
+
+  auto src_val = args.src_ptr[mat_idx_spec(r, c, args.src_idx_spec)];
+  auto grad_val = args.grad_ptr[mat_idx_spec(r, c, args.grad_idx_spec)];
+
+  args.dst_ptr[mat_idx_spec(r, c, args.dst_idx_spec)] =
+      src_val - args.lr * grad_val;
+}
+
+void device_matrix_step(MatrixStep args) {
+  auto l_rows = args.shape.rows;
+  auto l_cols = args.shape.cols;
+  kernel_matrix_step<<<kernel_config(l_rows, l_cols, 1)>>>(args);
+  auto err = cudaDeviceSynchronize();
+  panic_on_cuda_error(err);
+}

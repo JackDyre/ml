@@ -93,3 +93,16 @@ void Layer::print_chain(size_t layer_idx) {
     next.value()->print_chain(layer_idx + 1);
   }
 }
+
+void Layer::step(Layer &grad, float lr) {
+  weights.step_d(weights, grad.weights, lr);
+  biases.step_d(biases, grad.biases, lr);
+}
+
+void Layer::step_chain(Layer &grad, float lr) {
+  step(grad, lr);
+
+  if (prev.has_value()) {
+    prev.value()->step_chain(*grad.prev.value(), lr);
+  }
+}

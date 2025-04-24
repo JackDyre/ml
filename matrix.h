@@ -50,6 +50,7 @@ public:
   void act_grad_d(Matrix &next_grad_b, Matrix &next_w);
   void se_deriv_d(Matrix &a_out, Matrix &target);
   void weight_grad_d(Matrix &grad_b, Matrix &prev_a);
+  void step_d(Matrix &src, Matrix &grad, float lr);
 
   Matrix subview(SubviewArgs args);
 };
