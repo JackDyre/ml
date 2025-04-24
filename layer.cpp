@@ -1,5 +1,6 @@
 #include "layer.h"
 #include <cassert>
+#include <iostream>
 #include <memory>
 
 void Layer::set_prev(std::shared_ptr<Layer> p) { prev = p; }
