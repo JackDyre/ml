@@ -202,7 +202,6 @@ void device_matrix_elem_wise_mul(MatrixElemWiseMul args) {
   panic_on_cuda_error(err);
 }
 
-
 __global__ void kernel_matrix_grad_act(MatrixActGrad args) {
   std::size_t r = thread_block_idx(x);
   std::size_t c = thread_block_idx(y);

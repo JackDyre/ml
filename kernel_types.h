@@ -77,7 +77,6 @@ typedef struct MatrixElemWiseMul {
   IndexSpec r_idx_spec;
 } MatrixElemWiseMul;
 
-
 typedef struct MatrixActGrad {
   float *dst_ptr;
   float *next_grad_b_ptr;

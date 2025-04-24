@@ -229,7 +229,6 @@ void Matrix::elem_wise_mul_d(Matrix &l, Matrix &r) {
   device_matrix_elem_wise_mul(launch_args);
 }
 
-
 void Matrix::act_grad_d(Matrix &next_grad_b, Matrix &next_w) {
   assert(shape.cols == 1);
   assert(next_grad_b.shape.cols == 1);
