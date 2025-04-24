@@ -1,3 +1,4 @@
+#include <cstddef>
 #include <stddef.h>
 
 #ifndef TYPES_H
@@ -24,6 +25,13 @@ typedef enum DeviceOpt {
   _OPT_HOST,
   _OPT_NONE,
 } DeviceOpt;
+
+typedef struct SubviewArgs {
+  size_t rows_from;
+  size_t rows_to;
+  size_t cols_from;
+  size_t cols_to;
+} SubviewArgs;
 
 typedef struct IndexSpec {
   std::size_t stride;

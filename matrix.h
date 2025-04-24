@@ -9,7 +9,7 @@ class Matrix {
 private:
   DualSlice slice;
   Shape shape;
-  IndexSpec idx_spec = IndexSpec{.stride = shape.rows, .ptr_offset = 0};
+  IndexSpec idx_spec = IndexSpec{.stride = shape.cols, .ptr_offset = 0};
 
   Matrix(DualSlice slice, Shape shape, IndexSpec idx_spec)
       : slice(slice), shape(shape), idx_spec(idx_spec) {}
@@ -46,7 +46,12 @@ public:
   void relu_d(Matrix &src);
   void se_d(Matrix &a, Matrix &b);
   void relu_deriv_d(Matrix &src);
+  void elem_wise_mul_d(Matrix &l, Matrix &r);
+  void act_grad_d(Matrix &next_grad_b, Matrix &next_w);
+  void se_deriv_d(Matrix &a_out, Matrix &target);
+  void weight_grad_d(Matrix &grad_b, Matrix &prev_a);
 
+  Matrix subview(SubviewArgs args);
 };
 
 #endif // !MATRIX_H

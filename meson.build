@@ -117,14 +117,6 @@ matrix = static_library(
     link_with: [dual_slice, kernels],
 )
 
-run = executable(
-    'run',
-    'run.cpp',
-    cpp_args: cpp_args,
-    cuda_args: cuda_args,
-    link_with: [matrix],
-)
-
 layer = static_library(
     'layer',
     'layer.cpp',
@@ -139,4 +131,12 @@ nn = static_library(
     sources: ['nn.h'],
     cpp_args: cpp_args,
     link_with: [layer],
+)
+
+run = executable(
+    'run',
+    'run.cpp',
+    cpp_args: cpp_args,
+    cuda_args: cuda_args,
+    link_with: [nn],
 )

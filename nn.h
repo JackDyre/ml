@@ -29,11 +29,15 @@ public:
   // Move assignment
   NN &operator=(NN &&other) noexcept = default;
 
-  static NN from_sizes(std::vector<size_t> shapes);
+  static NN from_sizes_vec(std::vector<size_t> shapes);
+  static NN from_sizes_slice(size_t *shapes, size_t count);
 
   void forward();
-  void set_input(Matrix new_input);
+  void back_prop(NN &grad_nn, Matrix &target);
+  void set_input(Matrix &new_input);
   const Matrix get_output();
+  void random(float low, float high);
+  void print();
 };
 
 #endif // !NN_H

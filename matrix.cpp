@@ -181,3 +181,134 @@ void Matrix::relu_deriv_d(Matrix &src) {
   device_matrix_relu_deriv(launch_args);
 }
 
+Matrix Matrix::subview(SubviewArgs args) {
+  assert(args.rows_to > args.rows_from);
+  assert(args.cols_to > args.cols_from);
+
+  auto sv_rows = args.rows_to - args.rows_from;
+  auto sv_cols = args.cols_to - args.cols_from;
+
+  auto sv_shape = Shape{
+      .rows = sv_rows,
+      .cols = sv_cols,
+  };
+
+  auto sv_idx_spec = IndexSpec{
+      .stride = idx_spec.stride,
+      .ptr_offset = mat_idx_spec(args.rows_from, args.cols_from, idx_spec),
+  };
+
+  return Matrix(slice, sv_shape, sv_idx_spec);
+}
+
+void Matrix::elem_wise_mul_d(Matrix &l, Matrix &r) {
+  assert(shape.rows == l.shape.rows);
+  assert(shape.cols == l.shape.cols);
+  assert(r.shape.rows == l.shape.rows);
+  assert(r.shape.cols == l.shape.cols);
+
+  float *dst_ptr = (float *)slice.get_device_valid_inner();
+  auto dst_idx_spec = idx_spec;
+
+  float *l_ptr = (float *)l.slice.get_device_valid_inner();
+  auto l_idx_spec = l.idx_spec;
+
+  float *r_ptr = (float *)r.slice.get_device_valid_inner();
+  auto r_idx_spec = r.idx_spec;
+
+  auto launch_args = MatrixElemWiseMul{
+      .dst_ptr = dst_ptr,
+      .l_ptr = l_ptr,
+      .r_ptr = r_ptr,
+      .shape = shape,
+      .dst_idx_spec = dst_idx_spec,
+      .l_idx_spec = l_idx_spec,
+      .r_idx_spec = r_idx_spec,
+  };
+
+  device_matrix_elem_wise_mul(launch_args);
+}
+
+
+void Matrix::act_grad_d(Matrix &next_grad_b, Matrix &next_w) {
+  assert(shape.cols == 1);
+  assert(next_grad_b.shape.cols == 1);
+
+  assert(next_w.shape.rows == next_grad_b.shape.rows);
+  assert(next_w.shape.cols == shape.rows);
+
+  assert(shape.rows == next_w.shape.cols);
+
+  float *dst_ptr = (float *)slice.get_device_valid_inner();
+  auto dst_idx_spec = idx_spec;
+
+  float *next_grad_b_ptr = (float *)next_grad_b.slice.get_device_valid_inner();
+  auto next_grad_b_idx_spec = next_grad_b.idx_spec;
+
+  float *next_w_ptr = (float *)next_w.slice.get_device_valid_inner();
+  auto next_w_idx_spec = next_w.idx_spec;
+
+  auto launch_args = MatrixActGrad{
+      .dst_ptr = dst_ptr,
+      .next_grad_b_ptr = next_grad_b_ptr,
+      .next_w_ptr = next_w_ptr,
+      .shape = shape,
+      .k_max = next_grad_b.shape.rows,
+      .dst_idx_spec = dst_idx_spec,
+      .next_grad_b_idx_spec = next_grad_b_idx_spec,
+      .next_w_idx_spec = next_w_idx_spec,
+  };
+
+  device_matrix_grad_act(launch_args);
+}
+
+void Matrix::se_deriv_d(Matrix &a_out, Matrix &target) {
+  assert(a_out.shape.rows == target.shape.rows);
+  assert(a_out.shape.cols == target.shape.cols);
+  assert(shape.rows == a_out.shape.rows);
+  assert(shape.cols == a_out.shape.cols);
+
+  float *dst_ptr = (float *)slice.get_device_valid_inner();
+  auto dst_idx_spec = idx_spec;
+
+  float *a_ptr = (float *)a_out.slice.get_device_valid_inner();
+  auto a_idx_spec = a_out.idx_spec;
+
+  float *b_ptr = (float *)target.slice.get_device_valid_inner();
+  auto b_idx_spec = target.idx_spec;
+
+  auto launch_args = MatrixSEDeriv{
+      .dst_ptr = dst_ptr,
+      .a_ptr = a_ptr,
+      .b_ptr = b_ptr,
+      .shape = shape,
+      .dst_idx_spec = dst_idx_spec,
+      .a_idx_spec = a_idx_spec,
+      .b_idx_spec = b_idx_spec,
+  };
+
+  device_matrix_se_deriv(launch_args);
+}
+
+void Matrix::weight_grad_d(Matrix &grad_b, Matrix &prev_a) {
+  float *dst_ptr = (float *)slice.get_device_valid_inner();
+  auto dst_idx_spec = idx_spec;
+
+  float *grad_b_ptr = (float *)grad_b.slice.get_device_valid_inner();
+  auto grad_b_idx_spex = grad_b.idx_spec;
+
+  float *prev_a_ptr = (float *)prev_a.slice.get_device_valid_inner();
+  auto prev_a_idx_spec = prev_a.idx_spec;
+
+  auto launch_args = MatrixWeightGrad{
+      .dst_ptr = dst_ptr,
+      .b_grad_ptr = grad_b_ptr,
+      .a_prev_ptr = prev_a_ptr,
+      .shape = shape,
+      .dst_idx_spec = dst_idx_spec,
+      .b_grad_idx_spec = grad_b_idx_spex,
+      .a_prev_idx_spec = prev_a_idx_spec,
+  };
+
+  device_matrix_grad_weight(launch_args);
+}

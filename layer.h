@@ -43,6 +43,16 @@ public:
 
   void forward(Matrix &prev_acts);
   void forward_chain(Matrix &prev_acts);
+
+  void backprop(Layer &grad, Matrix &input);
+  void backprop_chain(Layer &grad, Matrix &input);
+  void backprop_chain_from_target(Layer &grad, Matrix &target, Matrix &input);
+
+  void randomize(float low, float high);
+  void randomize_chain(float low, float high);
+
+  void print(size_t layer_idx);
+  void print_chain(size_t layer_idx);
 };
 
 #endif // !LAYER_H

@@ -8,7 +8,12 @@
 
 #define panic_on_cuda_error(err) assert(err == cudaSuccess)
 
+// Original ReLU implementations
 #define relu(x) (x) <= 0 ? 0 : (x)
 #define relu_deriv(x) (x) <= 0 ? 0 : 1
+
+// Sigmoid implementations with relu names for compatibility
+// #define relu(x) 1.0f / (1.0f + expf(-(x)))
+// #define relu_deriv(x) relu(x) * (1.0f - relu(x))
 
 #endif // !UTIL_H
